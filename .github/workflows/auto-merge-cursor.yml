@@ -1,0 +1,72 @@
+name: Auto-merge Cursor Branches
+
+on:
+  push:
+    branches:
+      - 'cursor/**'  # Matches all branches starting with 'cursor/'
+  pull_request:
+    branches:
+      - main
+    types: [opened, synchronize]
+
+jobs:
+  auto-merge-cursor:
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/heads/cursor/')
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Configure Git
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+
+    - name: Create Pull Request
+      id: create-pr
+      uses: peter-evans/create-pull-request@v5
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        branch: ${{ github.ref_name }}
+        base: main
+        title: "Auto-merge: ${{ github.ref_name }}"
+        body: |
+          🤖 **Automated Pull Request from Cursor**
+          
+          This PR was automatically created from the Cursor branch: `${{ github.ref_name }}`
+          
+          **Branch:** ${{ github.ref_name }}
+          **Triggered by:** ${{ github.actor }}
+          **Commit:** ${{ github.sha }}
+          
+          ---
+          *This PR will be automatically merged if all checks pass.*
+        draft: false
+
+    - name: Enable auto-merge
+      if: steps.create-pr.outputs.pull-request-number
+      run: |
+        gh pr merge ${{ steps.create-pr.outputs.pull-request-number }} --auto --squash
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  auto-approve-and-merge:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' && startsWith(github.head_ref, 'cursor/')
+    
+    steps:
+    - name: Auto-approve PR
+      uses: juliangruber/approve-pull-request-action@v2
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        number: ${{ github.event.pull_request.number }}
+
+    - name: Enable auto-merge
+      run: |
+        gh pr merge ${{ github.event.pull_request.number }} --auto --squash
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
