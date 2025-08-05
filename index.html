@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Todo App</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -12,81 +14,103 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Roboto', sans-serif;
+            background: #f5f5f5;
             min-height: 100vh;
-            padding: 8px;
+            color: #212121;
+            line-height: 1.5;
         }
 
         .container {
-            max-width: 600px;
+            max-width: 100%;
             margin: 0 auto;
-            background: white;
-            border-radius: 16px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
+            background: #ffffff;
+            min-height: 100vh;
+            box-shadow: 0 0 16px rgba(0, 0, 0, 0.1);
+            position: relative;
         }
 
-        .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        /* Material Design App Bar */
+        .app-bar {
+            background: #1976d2;
             color: white;
             padding: 16px;
-            text-align: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            position: relative;
+            z-index: 100;
         }
 
-        .header h1 {
-            font-size: 1.8rem;
-            margin-bottom: 6px;
-            font-weight: 400;
+        .app-bar h1 {
+            font-size: 20px;
+            font-weight: 500;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        .header p {
-            opacity: 0.9;
-            font-size: 0.9rem;
+        .app-bar h1 .material-icons {
+            font-size: 24px;
+        }
+
+        .menu-icon {
+            margin-right: 8px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            transition: background-color 0.3s ease;
+        }
+
+        .menu-icon:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .app-bar p {
+            opacity: 0.87;
+            font-size: 14px;
             margin-bottom: 16px;
         }
 
         .list-management {
             display: flex;
             align-items: center;
-            justify-content: center;
             gap: 8px;
             flex-wrap: wrap;
         }
 
         .current-list {
             background: rgba(255, 255, 255, 0.2);
-            padding: 6px 12px;
-            border-radius: 20px;
+            padding: 8px 16px;
+            border-radius: 16px;
             font-size: 14px;
             font-weight: 500;
             min-width: 120px;
             text-align: center;
-            margin-bottom: 8px;
         }
 
         .list-controls {
             display: flex;
-            gap: 6px;
+            gap: 8px;
             align-items: center;
             flex-wrap: wrap;
-            justify-content: center;
         }
 
         .list-btn {
-            background: rgba(255, 255, 255, 0.3);
+            background: transparent;
             color: white;
             border: 1px solid rgba(255, 255, 255, 0.5);
-            padding: 6px 12px;
-            border-radius: 16px;
+            padding: 8px 16px;
+            border-radius: 4px;
             cursor: pointer;
             font-size: 12px;
+            text-transform: uppercase;
+            font-weight: 500;
             transition: all 0.3s ease;
             white-space: nowrap;
         }
 
         .list-btn:hover {
-            background: rgba(255, 255, 255, 0.4);
+            background: rgba(255, 255, 255, 0.1);
             border-color: rgba(255, 255, 255, 0.8);
         }
 
@@ -96,20 +120,22 @@
         }
 
         .list-dropdown {
-            background: rgba(255, 255, 255, 0.3);
+            background: transparent;
             color: white;
             border: 1px solid rgba(255, 255, 255, 0.5);
-            padding: 6px 24px 6px 12px;
-            border-radius: 16px;
+            padding: 8px 32px 8px 16px;
+            border-radius: 4px;
             cursor: pointer;
             font-size: 12px;
+            text-transform: uppercase;
+            font-weight: 500;
             transition: all 0.3s ease;
             appearance: none;
             min-width: 100px;
         }
 
         .list-dropdown:hover {
-            background: rgba(255, 255, 255, 0.4);
+            background: rgba(255, 255, 255, 0.1);
             border-color: rgba(255, 255, 255, 0.8);
         }
 
@@ -123,208 +149,310 @@
             pointer-events: none;
         }
 
+        /* Material Design Cards */
+        .content-card {
+            margin: 0;
+            background: white;
+            border-radius: 0;
+        }
+
         .input-section {
             padding: 16px;
-            border-bottom: 1px solid #f0f0f0;
+            background: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+            position: relative;
         }
 
         .input-container {
             display: flex;
             gap: 8px;
-            margin-bottom: 12px;
+            margin-bottom: 16px;
+            align-items: flex-end;
+        }
+
+        /* Material Design Text Field */
+        .input-wrapper {
+            flex: 1;
+            position: relative;
         }
 
         #todoInput {
-            flex: 1;
-            padding: 12px 16px;
-            border: 2px solid #e0e0e0;
-            border-radius: 24px;
-            font-size: 14px;
+            width: 100%;
+            padding: 16px 12px 8px 12px;
+            border: none;
+            border-bottom: 2px solid #e0e0e0;
+            font-size: 16px;
             outline: none;
-            transition: all 0.3s ease;
+            transition: border-color 0.3s ease;
+            background: transparent;
+            font-family: 'Roboto', sans-serif;
         }
 
         #todoInput:focus {
-            border-color: #667eea;
-            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+            border-bottom-color: #1976d2;
         }
 
-        #addBtn {
-            padding: 12px 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        .input-label {
+            position: absolute;
+            left: 12px;
+            top: 16px;
+            font-size: 16px;
+            color: #757575;
+            transition: all 0.3s ease;
+            pointer-events: none;
+        }
+
+        #todoInput:focus + .input-label,
+        #todoInput:not(:placeholder-shown) + .input-label {
+            top: 4px;
+            font-size: 12px;
+            color: #1976d2;
+        }
+
+        /* Material Design Floating Action Button */
+        .fab {
+            position: fixed;
+            bottom: 16px;
+            right: 16px;
+            width: 56px;
+            height: 56px;
+            background: #1976d2;
             color: white;
             border: none;
-            border-radius: 24px;
+            border-radius: 50%;
             cursor: pointer;
-            font-size: 14px;
-            font-weight: 600;
+            font-size: 24px;
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.3);
             transition: all 0.3s ease;
-            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
         }
 
-        #addBtn:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        .fab:hover {
+            background: #1565c0;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+            transform: scale(1.05);
         }
 
+        .fab:active {
+            transform: scale(0.95);
+        }
+
+        /* Hide the old add button */
+        #addBtn {
+            display: none;
+        }
+
+        /* Material Design Tab Bar */
         .filters {
             display: flex;
-            gap: 6px;
-            justify-content: center;
-            flex-wrap: wrap;
+            background: white;
+            border-bottom: 1px solid #e0e0e0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            position: relative;
         }
 
         .filter-btn {
-            padding: 6px 12px;
-            border: 1px solid #e0e0e0;
-            background: white;
-            border-radius: 16px;
+            flex: 1;
+            padding: 16px 12px;
+            border: none;
+            background: transparent;
             cursor: pointer;
-            font-size: 12px;
+            font-size: 14px;
+            font-weight: 500;
             transition: all 0.3s ease;
+            color: #757575;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: relative;
+            text-align: center;
         }
 
         .filter-btn.active {
-            background: #667eea;
-            color: white;
-            border-color: #667eea;
+            color: #1976d2;
+        }
+
+        .filter-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #1976d2;
+            animation: slideIn 0.3s ease;
+        }
+
+        .filter-btn:hover:not(.active) {
+            background: rgba(25, 118, 210, 0.04);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: scaleX(0);
+            }
+            to {
+                transform: scaleX(1);
+            }
         }
 
         .todos-section {
-            padding: 0 16px 16px;
+            padding: 0;
+            background: white;
+            min-height: calc(100vh - 200px);
         }
 
         .stats {
-            text-align: center;
-            margin-bottom: 12px;
-            color: #666;
-            font-size: 12px;
+            padding: 16px;
+            color: #757575;
+            font-size: 14px;
+            font-weight: 500;
+            background: #fafafa;
+            border-bottom: 1px solid #e0e0e0;
         }
 
+        /* Material Design List Items */
         .todo-item {
             display: flex;
             align-items: center;
-            padding: 12px 0;
-            border-bottom: 1px solid #f0f0f0;
-            animation: slideIn 0.3s ease;
+            padding: 16px;
+            border-bottom: 1px solid #e0e0e0;
+            transition: background-color 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .todo-item:hover {
+            background: #f5f5f5;
         }
 
         .todo-item:last-child {
             border-bottom: none;
         }
 
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateX(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
+        /* Material Design Checkbox */
         .todo-checkbox {
-            width: 18px;
-            height: 18px;
-            border: 2px solid #ddd;
-            border-radius: 50%;
-            margin-right: 12px;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #757575;
+            border-radius: 2px;
+            margin-right: 16px;
             cursor: pointer;
             transition: all 0.3s ease;
             position: relative;
             flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .todo-checkbox.checked {
-            background: #4CAF50;
-            border-color: #4CAF50;
+            background: #1976d2;
+            border-color: #1976d2;
         }
 
         .todo-checkbox.checked::after {
             content: '✓';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
             color: white;
-            font-size: 10px;
+            font-size: 12px;
             font-weight: bold;
         }
 
         .todo-text {
             flex: 1;
-            font-size: 14px;
+            font-size: 16px;
             transition: all 0.3s ease;
             word-break: break-word;
-            line-height: 1.3;
+            line-height: 1.4;
+            color: #212121;
         }
 
         .todo-text.completed {
             text-decoration: line-through;
-            color: #999;
+            color: #757575;
         }
 
         .todo-date {
-            font-size: 10px;
-            color: #999;
-            margin-right: 8px;
+            font-size: 12px;
+            color: #757575;
+            margin-right: 16px;
             flex-shrink: 0;
         }
 
+        /* Material Design Icon Button */
         .delete-btn {
-            background: #ff4757;
-            color: white;
+            background: transparent;
+            color: #757575;
             border: none;
             border-radius: 50%;
-            width: 24px;
-            height: 24px;
+            width: 40px;
+            height: 40px;
             cursor: pointer;
-            font-size: 12px;
+            font-size: 18px;
             transition: all 0.3s ease;
             flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .delete-btn:hover {
-            background: #ff3742;
-            transform: scale(1.1);
+            background: rgba(244, 67, 54, 0.1);
+            color: #f44336;
         }
 
         .empty-state {
             text-align: center;
-            padding: 32px 16px;
-            color: #999;
+            padding: 48px 16px;
+            color: #757575;
         }
 
-        .empty-state img {
-            width: 80px;
-            height: 80px;
+        .empty-state .material-icons {
+            font-size: 72px;
             margin-bottom: 16px;
-            opacity: 0.5;
+            color: #bdbdbd;
+        }
+
+        .empty-state h3 {
+            font-size: 20px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: #424242;
+        }
+
+        .empty-state p {
+            font-size: 14px;
+            line-height: 1.4;
         }
 
         .clear-completed {
+            padding: 16px;
             text-align: center;
-            margin-top: 16px;
+            background: #fafafa;
+            border-top: 1px solid #e0e0e0;
         }
 
         .clear-btn {
             padding: 8px 16px;
-            background: #ff4757;
-            color: white;
-            border: none;
-            border-radius: 16px;
+            background: transparent;
+            color: #f44336;
+            border: 1px solid #f44336;
+            border-radius: 4px;
             cursor: pointer;
-            font-size: 12px;
+            font-size: 14px;
+            text-transform: uppercase;
+            font-weight: 500;
             transition: all 0.3s ease;
         }
 
         .clear-btn:hover {
-            background: #ff3742;
-            transform: translateY(-1px);
+            background: rgba(244, 67, 54, 0.1);
         }
 
-        /* Modal styles */
+        /* Material Design Dialogs */
         .modal {
             display: none;
             position: fixed;
@@ -339,12 +467,14 @@
 
         .modal-content {
             background-color: white;
-            margin: 15% auto;
-            padding: 20px;
-            border-radius: 16px;
+            margin: 10% auto;
+            padding: 24px;
+            border-radius: 4px;
             width: 90%;
             max-width: 400px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 24px 38px rgba(0, 0, 0, 0.14), 
+                        0 9px 46px rgba(0, 0, 0, 0.12), 
+                        0 11px 15px rgba(0, 0, 0, 0.2);
             animation: slideInModal 0.3s ease;
         }
 
@@ -359,25 +489,26 @@
         }
 
         .modal h2 {
-            color: #333;
+            color: #212121;
             margin-bottom: 16px;
-            text-align: center;
-            font-size: 1.4rem;
+            font-size: 20px;
+            font-weight: 500;
         }
 
         .modal input {
             width: 100%;
-            padding: 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 14px;
-            margin-bottom: 16px;
+            padding: 16px 12px 8px 12px;
+            border: none;
+            border-bottom: 2px solid #e0e0e0;
+            font-size: 16px;
+            margin-bottom: 24px;
             outline: none;
             transition: border-color 0.3s ease;
+            font-family: 'Roboto', sans-serif;
         }
 
         .modal input:focus {
-            border-color: #667eea;
+            border-bottom-color: #1976d2;
         }
 
         .modal-buttons {
@@ -389,40 +520,45 @@
         .modal-btn {
             padding: 8px 16px;
             border: none;
-            border-radius: 8px;
+            border-radius: 4px;
             cursor: pointer;
-            font-size: 12px;
+            font-size: 14px;
+            text-transform: uppercase;
+            font-weight: 500;
             transition: all 0.3s ease;
+            min-width: 64px;
         }
 
         .modal-btn.primary {
-            background: #667eea;
+            background: #1976d2;
             color: white;
         }
 
         .modal-btn.primary:hover {
-            background: #5a6fd8;
+            background: #1565c0;
         }
 
         .modal-btn.secondary {
-            background: #f0f0f0;
-            color: #333;
+            background: transparent;
+            color: #1976d2;
         }
 
         .modal-btn.secondary:hover {
-            background: #e0e0e0;
+            background: rgba(25, 118, 210, 0.1);
         }
 
         .list-manager {
             margin-top: 16px;
+            max-height: 300px;
+            overflow-y: auto;
         }
 
         .list-item {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px solid #f0f0f0;
+            padding: 12px 0;
+            border-bottom: 1px solid #e0e0e0;
         }
 
         .list-item:last-child {
@@ -431,12 +567,13 @@
 
         .list-name {
             flex: 1;
-            font-size: 14px;
+            font-size: 16px;
+            color: #212121;
         }
 
         .list-name.current {
-            font-weight: bold;
-            color: #667eea;
+            font-weight: 500;
+            color: #1976d2;
         }
 
         .list-actions {
@@ -445,131 +582,79 @@
         }
 
         .list-action-btn {
-            background: none;
+            background: transparent;
             border: none;
-            padding: 4px 8px;
+            padding: 8px 12px;
             border-radius: 4px;
             cursor: pointer;
-            font-size: 11px;
+            font-size: 12px;
+            text-transform: uppercase;
+            font-weight: 500;
             transition: background-color 0.3s ease;
+            color: #1976d2;
         }
 
         .list-action-btn:hover {
-            background: #f0f0f0;
+            background: rgba(25, 118, 210, 0.1);
         }
 
         .list-action-btn.delete {
-            color: #ff4757;
+            color: #f44336;
         }
 
         .list-action-btn.delete:hover {
-            background: #ffe0e0;
+            background: rgba(244, 67, 54, 0.1);
         }
 
-        /* Mobile-first responsive design */
-        @media (min-width: 480px) {
-            body {
-                padding: 12px;
-            }
-            
-            .container {
-                border-radius: 20px;
-            }
-            
-            .header {
-                padding: 20px;
-            }
-            
-            .header h1 {
-                font-size: 2rem;
-            }
-            
-            .input-section {
-                padding: 20px;
-            }
-            
-            .todos-section {
-                padding: 0 20px 20px;
-            }
+        /* Enhanced Ripple Effect */
+        .ripple {
+            position: relative;
+            overflow: hidden;
         }
 
+        .ripple::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.4);
+            transform: translate(-50%, -50%);
+            transition: width 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), 
+                        height 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .ripple:active::before {
+            width: 200px;
+            height: 200px;
+        }
+
+        /* Touch feedback for buttons */
+        .fab:active {
+            transform: scale(0.96);
+        }
+
+        .filter-btn:active {
+            transform: scale(0.98);
+        }
+
+        .list-btn:active {
+            transform: scale(0.96);
+        }
+
+        /* Responsive Design */
         @media (min-width: 768px) {
-            body {
-                padding: 20px;
+            .container {
+                max-width: 500px;
+                margin: 20px auto;
+                border-radius: 4px;
+                box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
             }
             
-            .header {
-                padding: 24px;
-            }
-            
-            .header h1 {
-                font-size: 2.2rem;
-            }
-            
-            .current-list {
-                min-width: 160px;
-                font-size: 15px;
-            }
-            
-            .list-btn, .list-dropdown {
-                font-size: 13px;
-                padding: 8px 16px;
-            }
-            
-            .input-container {
-                gap: 12px;
-            }
-            
-            #todoInput {
-                font-size: 15px;
-                padding: 14px 18px;
-            }
-            
-            #addBtn {
-                font-size: 15px;
-                padding: 14px 24px;
-            }
-            
-            .filter-btn {
-                font-size: 13px;
-                padding: 8px 16px;
-            }
-            
-            .todo-text {
-                font-size: 15px;
-            }
-            
-            .todo-date {
-                font-size: 11px;
-            }
-        }
-
-        /* Landscape mobile optimization */
-        @media (max-height: 500px) and (orientation: landscape) {
-            .header {
-                padding: 12px;
-            }
-            
-            .header h1 {
-                font-size: 1.4rem;
-                margin-bottom: 4px;
-            }
-            
-            .header p {
-                font-size: 0.8rem;
-                margin-bottom: 8px;
-            }
-            
-            .input-section {
-                padding: 12px;
-            }
-            
-            .todos-section {
-                padding: 0 12px 12px;
-            }
-            
-            .empty-state {
-                padding: 20px 16px;
+            .app-bar {
+                border-radius: 4px 4px 0 0;
             }
         }
 
@@ -579,23 +664,149 @@
             .delete-btn,
             .filter-btn,
             .list-btn {
-                min-height: 44px;
-                min-width: 44px;
+                min-height: 48px;
+                min-width: 48px;
                 display: flex;
                 align-items: center;
                 justify-content: center;
             }
             
             .todo-item {
-                padding: 16px 0;
+                padding: 16px;
+            }
+            
+            .fab {
+                bottom: 24px;
+                right: 24px;
+            }
+        }
+
+        /* Navigation Drawer */
+        .drawer {
+            position: fixed;
+            left: -300px;
+            top: 0;
+            width: 300px;
+            height: 100vh;
+            background: white;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            transition: left 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            z-index: 2000;
+            overflow-y: auto;
+        }
+
+        .drawer.open {
+            left: 0;
+        }
+
+        .drawer-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1999;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .drawer-overlay.open {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .drawer-header {
+            background: #1976d2;
+            color: white;
+            padding: 24px 16px 16px 16px;
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+        }
+
+        .drawer-header h2 {
+            font-size: 18px;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .drawer-header p {
+            font-size: 14px;
+            opacity: 0.87;
+        }
+
+        .drawer-content {
+            padding: 8px 0;
+        }
+
+        .drawer-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            font-size: 16px;
+            color: #212121;
+        }
+
+        .drawer-item:hover {
+            background: rgba(25, 118, 210, 0.04);
+        }
+
+        .drawer-item.active {
+            background: rgba(25, 118, 210, 0.08);
+            color: #1976d2;
+        }
+
+        .drawer-item .material-icons {
+            margin-right: 32px;
+            color: #757575;
+            font-size: 24px;
+        }
+
+        .drawer-item.active .material-icons {
+            color: #1976d2;
+        }
+
+        .drawer-divider {
+            height: 1px;
+            background: #e0e0e0;
+            margin: 8px 0;
+        }
+
+        /* Status bar simulation for full mobile experience */
+        @media (max-width: 767px) {
+            body {
+                background: #000;
+                padding-top: 24px;
+            }
+            
+            .container {
+                border-radius: 0;
+                box-shadow: none;
+            }
+            
+            .app-bar {
+                border-radius: 0;
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <h1>✨ Todo Lists</h1>
+        <div class="app-bar">
+            <h1>
+                <span class="material-icons menu-icon" onclick="app.toggleDrawer()">menu</span>
+                <span class="material-icons">assignment</span>
+                Todo Lists
+            </h1>
             <p>Organize your projects and trips</p>
             
             <div class="list-management">
@@ -604,16 +815,21 @@
                     <select class="list-dropdown" id="listSelector">
                         <option value="">Switch List</option>
                     </select>
-                    <button class="list-btn" id="newListBtn">New List</button>
-                    <button class="list-btn" id="manageListsBtn">Manage</button>
+                    <button class="list-btn ripple" id="newListBtn">New List</button>
+                    <button class="list-btn ripple" id="manageListsBtn">Manage</button>
                 </div>
             </div>
         </div>
         
-        <div class="input-section">
-            <div class="input-container">
-                <input type="text" id="todoInput" placeholder="What needs to be done?" maxlength="200">
-                <button id="addBtn">Add Todo</button>
+        <div class="content-card">
+            <div class="input-section">
+                <div class="input-container">
+                    <div class="input-wrapper">
+                        <input type="text" id="todoInput" placeholder=" " maxlength="200">
+                        <label class="input-label">What needs to be done?</label>
+                    </div>
+                    <button id="addBtn">Add Todo</button>
+                </div>
             </div>
             
             <div class="filters">
@@ -621,16 +837,34 @@
                 <button class="filter-btn" data-filter="active">Active</button>
                 <button class="filter-btn" data-filter="completed">Completed</button>
             </div>
-        </div>
-        
-        <div class="todos-section">
-            <div class="stats" id="stats">0 items left</div>
-            <div id="todoList"></div>
-            <div class="clear-completed" id="clearSection" style="display: none;">
-                <button class="clear-btn" id="clearCompleted">Clear Completed</button>
+            
+            <div class="todos-section">
+                <div class="stats" id="stats">0 items left</div>
+                <div id="todoList"></div>
+                <div class="clear-completed" id="clearSection" style="display: none;">
+                    <button class="clear-btn" id="clearCompleted">Clear Completed</button>
+                </div>
             </div>
+            
         </div>
     </div>
+
+    <!-- Navigation Drawer -->
+    <div class="drawer-overlay" id="drawerOverlay" onclick="app.closeDrawer()"></div>
+    <div class="drawer" id="drawer">
+        <div class="drawer-header">
+            <h2>Todo Lists</h2>
+            <p>Organize your life</p>
+        </div>
+        <div class="drawer-content" id="drawerContent">
+            <!-- Dynamic content will be inserted here -->
+        </div>
+    </div>
+
+    <!-- Floating Action Button -->
+    <button class="fab ripple" id="fabBtn" title="Add new todo">
+        <span class="material-icons">add</span>
+    </button>
 
     <!-- New List Modal -->
     <div id="newListModal" class="modal">
@@ -669,12 +903,14 @@
                 this.bindEvents();
                 this.updateListSelector();
                 this.updateCurrentListDisplay();
+                this.updateDrawerContent();
                 this.render();
             }
 
             bindEvents() {
                 const todoInput = document.getElementById('todoInput');
                 const addBtn = document.getElementById('addBtn');
+                const fabBtn = document.getElementById('fabBtn');
                 const filterBtns = document.querySelectorAll('.filter-btn');
                 const clearBtn = document.getElementById('clearCompleted');
                 const listSelector = document.getElementById('listSelector');
@@ -683,6 +919,7 @@
                 const newListName = document.getElementById('newListName');
 
                 addBtn.addEventListener('click', () => this.addTodo());
+                fabBtn.addEventListener('click', () => this.addTodo());
                 todoInput.addEventListener('keypress', (e) => {
                     if (e.key === 'Enter') this.addTodo();
                 });
@@ -812,6 +1049,7 @@
                     this.currentListId = listId;
                     this.saveCurrentListId();
                     this.updateCurrentListDisplay();
+                    this.updateDrawerContent();
                     this.render();
                 }
             }
@@ -850,6 +1088,7 @@
                 this.saveCurrentListId();
                 this.updateListSelector();
                 this.updateCurrentListDisplay();
+                this.updateDrawerContent();
                 this.render();
                 
                 nameInput.value = '';
@@ -867,16 +1106,17 @@
                     delete this.lists[listId];
                     
                     // Switch to another list if we deleted the current one
-                    if (this.currentListId === listId) {
-                        this.currentListId = Object.keys(this.lists)[0];
-                        this.saveCurrentListId();
-                        this.updateCurrentListDisplay();
-                        this.render();
-                    }
-                    
-                    this.saveLists();
-                    this.updateListSelector();
-                    this.renderListManager();
+                                    if (this.currentListId === listId) {
+                    this.currentListId = Object.keys(this.lists)[0];
+                    this.saveCurrentListId();
+                    this.updateCurrentListDisplay();
+                    this.render();
+                }
+                
+                this.saveLists();
+                this.updateListSelector();
+                this.updateDrawerContent();
+                this.renderListManager();
                 }
             }
 
@@ -897,11 +1137,12 @@
                         return;
                     }
 
-                    this.lists[listId].name = trimmedName;
-                    this.saveLists();
-                    this.updateListSelector();
-                    this.updateCurrentListDisplay();
-                    this.renderListManager();
+                                    this.lists[listId].name = trimmedName;
+                this.saveLists();
+                this.updateListSelector();
+                this.updateCurrentListDisplay();
+                this.updateDrawerContent();
+                this.renderListManager();
                 }
             }
 
@@ -1014,7 +1255,7 @@
                     const currentListName = this.lists[this.currentListId]?.name || 'this list';
                     todoList.innerHTML = `
                         <div class="empty-state">
-                            <div style="font-size: 4rem; margin-bottom: 20px;">📝</div>
+                            <span class="material-icons">assignment</span>
                             <h3>No todos ${this.currentFilter === 'all' ? 'yet' : 'in this filter'}</h3>
                             <p>${this.currentFilter === 'all' ? 
                                 `Add a new todo to "${currentListName}" to get started!` : 
@@ -1028,7 +1269,9 @@
                                  onclick="app.toggleTodo(${todo.id})"></div>
                             <div class="todo-text ${todo.completed ? 'completed' : ''}">${this.escapeHtml(todo.text)}</div>
                             <div class="todo-date">${this.formatDate(todo.createdAt)}</div>
-                            <button class="delete-btn" onclick="app.deleteTodo(${todo.id})">×</button>
+                            <button class="delete-btn" onclick="app.deleteTodo(${todo.id})">
+                                <span class="material-icons">delete</span>
+                            </button>
                         </div>
                     `).join('');
                 }
@@ -1082,6 +1325,68 @@
 
             getCurrentListId() {
                 return localStorage.getItem('currentListId') || 'default';
+            }
+
+            // Drawer methods
+            toggleDrawer() {
+                const drawer = document.getElementById('drawer');
+                const overlay = document.getElementById('drawerOverlay');
+                
+                if (drawer.classList.contains('open')) {
+                    this.closeDrawer();
+                } else {
+                    this.openDrawer();
+                }
+            }
+
+            openDrawer() {
+                const drawer = document.getElementById('drawer');
+                const overlay = document.getElementById('drawerOverlay');
+                
+                this.updateDrawerContent();
+                drawer.classList.add('open');
+                overlay.classList.add('open');
+            }
+
+            closeDrawer() {
+                const drawer = document.getElementById('drawer');
+                const overlay = document.getElementById('drawerOverlay');
+                
+                drawer.classList.remove('open');
+                overlay.classList.remove('open');
+            }
+
+            updateDrawerContent() {
+                const container = document.getElementById('drawerContent');
+                const lists = Object.values(this.lists).sort((a, b) => 
+                    new Date(a.createdAt) - new Date(b.createdAt)
+                );
+
+                let content = `
+                    <button class="drawer-item" onclick="app.openModal('newListModal'); app.closeDrawer()">
+                        <span class="material-icons">add</span>
+                        Create New List
+                    </button>
+                    <div class="drawer-divider"></div>
+                `;
+
+                content += lists.map(list => `
+                    <button class="drawer-item ${list.id === this.currentListId ? 'active' : ''}" 
+                            onclick="app.switchList('${list.id}'); app.closeDrawer()">
+                        <span class="material-icons">${list.id === this.currentListId ? 'check_circle' : 'list'}</span>
+                        ${this.escapeHtml(list.name)}
+                    </button>
+                `).join('');
+
+                content += `
+                    <div class="drawer-divider"></div>
+                    <button class="drawer-item" onclick="app.openManageListsModal(); app.closeDrawer()">
+                        <span class="material-icons">settings</span>
+                        Manage Lists
+                    </button>
+                `;
+
+                container.innerHTML = content;
             }
         }
 
