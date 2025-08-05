@@ -1,0 +1,47 @@
+name: Direct Merge Cursor Branches
+
+on:
+  push:
+    branches:
+      - 'cursor/**'  # Matches all branches starting with 'cursor/'
+
+jobs:
+  direct-merge:
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/heads/cursor/')
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Configure Git
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+
+    - name: Merge to main
+      run: |
+        # Fetch the latest main branch
+        git fetch origin main
+        
+        # Switch to main
+        git checkout main
+        
+        # Merge the cursor branch
+        git merge origin/${{ github.ref_name }} --no-ff -m "Auto-merge: ${{ github.ref_name }}"
+        
+        # Push the merged changes
+        git push origin main
+        
+        # Delete the cursor branch
+        git push origin --delete ${{ github.ref_name }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Notify completion
+      run: |
+        echo "✅ Successfully merged ${{ github.ref_name }} into main"
+        echo "🗑️ Deleted branch ${{ github.ref_name }}"
