@@ -19,7 +19,7 @@
         }
 
         .container {
-            max-width: 600px;
+            max-width: 700px;
             margin: 0 auto;
             background: white;
             border-radius: 20px;
@@ -43,6 +43,82 @@
         .header p {
             opacity: 0.9;
             font-size: 1.1rem;
+            margin-bottom: 20px;
+        }
+
+        .list-management {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .current-list {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 500;
+            min-width: 200px;
+            text-align: center;
+        }
+
+        .list-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .list-btn {
+            background: rgba(255, 255, 255, 0.3);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .list-btn:hover {
+            background: rgba(255, 255, 255, 0.4);
+            border-color: rgba(255, 255, 255, 0.8);
+        }
+
+        .list-selector {
+            position: relative;
+            display: inline-block;
+        }
+
+        .list-dropdown {
+            background: rgba(255, 255, 255, 0.3);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            padding: 8px 30px 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            appearance: none;
+            min-width: 120px;
+        }
+
+        .list-dropdown:hover {
+            background: rgba(255, 255, 255, 0.4);
+            border-color: rgba(255, 255, 255, 0.8);
+        }
+
+        .list-dropdown::after {
+            content: '▼';
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 10px;
+            pointer-events: none;
         }
 
         .input-section {
@@ -240,6 +316,147 @@
             transform: translateY(-2px);
         }
 
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 10% auto;
+            padding: 30px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            animation: slideInModal 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideInModal {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal h2 {
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .modal input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            margin-bottom: 20px;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        .modal input:focus {
+            border-color: #667eea;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .modal-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .modal-btn.primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .modal-btn.primary:hover {
+            background: #5a6fd8;
+        }
+
+        .modal-btn.secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .modal-btn.secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .list-manager {
+            margin-top: 20px;
+        }
+
+        .list-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .list-item:last-child {
+            border-bottom: none;
+        }
+
+        .list-name {
+            flex: 1;
+            font-size: 16px;
+        }
+
+        .list-name.current {
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .list-actions {
+            display: flex;
+            gap: 5px;
+        }
+
+        .list-action-btn {
+            background: none;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background-color 0.3s ease;
+        }
+
+        .list-action-btn:hover {
+            background: #f0f0f0;
+        }
+
+        .list-action-btn.delete {
+            color: #ff4757;
+        }
+
+        .list-action-btn.delete:hover {
+            background: #ffe0e0;
+        }
+
         @media (max-width: 640px) {
             .container {
                 margin: 10px;
@@ -252,6 +469,16 @@
 
             .header h1 {
                 font-size: 2rem;
+            }
+
+            .list-management {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .list-controls {
+                flex-wrap: wrap;
+                justify-content: center;
             }
 
             .input-section {
@@ -273,14 +500,30 @@
             .filters {
                 flex-wrap: wrap;
             }
+
+            .modal-content {
+                margin: 20% auto;
+                padding: 20px;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>✨ Todo App</h1>
-            <p>Stay organized and productive</p>
+            <h1>✨ Todo Lists</h1>
+            <p>Organize your projects and trips</p>
+            
+            <div class="list-management">
+                <div class="current-list" id="currentListDisplay">My List</div>
+                <div class="list-controls">
+                    <select class="list-dropdown" id="listSelector">
+                        <option value="">Switch List</option>
+                    </select>
+                    <button class="list-btn" id="newListBtn">New List</button>
+                    <button class="list-btn" id="manageListsBtn">Manage</button>
+                </div>
+            </div>
         </div>
         
         <div class="input-section">
@@ -305,16 +548,43 @@
         </div>
     </div>
 
+    <!-- New List Modal -->
+    <div id="newListModal" class="modal">
+        <div class="modal-content">
+            <h2>Create New List</h2>
+            <input type="text" id="newListName" placeholder="Enter list name (e.g., 'Tokyo Trip', 'Work Project')" maxlength="50">
+            <div class="modal-buttons">
+                <button class="modal-btn secondary" onclick="app.closeModal('newListModal')">Cancel</button>
+                <button class="modal-btn primary" onclick="app.createNewList()">Create</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Manage Lists Modal -->
+    <div id="manageListsModal" class="modal">
+        <div class="modal-content">
+            <h2>Manage Lists</h2>
+            <div id="listManager" class="list-manager"></div>
+            <div class="modal-buttons">
+                <button class="modal-btn secondary" onclick="app.closeModal('manageListsModal')">Close</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         class TodoApp {
             constructor() {
-                this.todos = this.loadTodos();
+                this.currentListId = this.getCurrentListId();
+                this.lists = this.loadLists();
                 this.currentFilter = 'all';
+                this.ensureDefaultList();
                 this.init();
             }
 
             init() {
                 this.bindEvents();
+                this.updateListSelector();
+                this.updateCurrentListDisplay();
                 this.render();
             }
 
@@ -323,6 +593,10 @@
                 const addBtn = document.getElementById('addBtn');
                 const filterBtns = document.querySelectorAll('.filter-btn');
                 const clearBtn = document.getElementById('clearCompleted');
+                const listSelector = document.getElementById('listSelector');
+                const newListBtn = document.getElementById('newListBtn');
+                const manageListsBtn = document.getElementById('manageListsBtn');
+                const newListName = document.getElementById('newListName');
 
                 addBtn.addEventListener('click', () => this.addTodo());
                 todoInput.addEventListener('keypress', (e) => {
@@ -336,6 +610,51 @@
                 });
 
                 clearBtn.addEventListener('click', () => this.clearCompleted());
+                
+                listSelector.addEventListener('change', (e) => {
+                    if (e.target.value) {
+                        this.switchList(e.target.value);
+                        e.target.value = ''; // Reset selector
+                    }
+                });
+
+                newListBtn.addEventListener('click', () => this.openModal('newListModal'));
+                manageListsBtn.addEventListener('click', () => this.openManageListsModal());
+
+                newListName.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') this.createNewList();
+                });
+
+                // Close modals when clicking outside
+                window.addEventListener('click', (e) => {
+                    if (e.target.classList.contains('modal')) {
+                        this.closeModal(e.target.id);
+                    }
+                });
+            }
+
+            ensureDefaultList() {
+                if (Object.keys(this.lists).length === 0) {
+                    const defaultList = {
+                        id: 'default',
+                        name: 'My List',
+                        todos: [],
+                        createdAt: new Date().toISOString()
+                    };
+                    this.lists['default'] = defaultList;
+                    this.currentListId = 'default';
+                    this.saveLists();
+                }
+
+                // Ensure current list exists
+                if (!this.lists[this.currentListId]) {
+                    this.currentListId = Object.keys(this.lists)[0];
+                    this.saveCurrentListId();
+                }
+            }
+
+            getCurrentTodos() {
+                return this.lists[this.currentListId]?.todos || [];
             }
 
             addTodo() {
@@ -351,24 +670,25 @@
                     createdAt: new Date().toISOString()
                 };
 
-                this.todos.unshift(todo);
-                this.saveTodos();
+                this.lists[this.currentListId].todos.unshift(todo);
+                this.saveLists();
                 this.render();
                 input.value = '';
             }
 
             toggleTodo(id) {
-                const todo = this.todos.find(t => t.id === id);
+                const todos = this.getCurrentTodos();
+                const todo = todos.find(t => t.id === id);
                 if (todo) {
                     todo.completed = !todo.completed;
-                    this.saveTodos();
+                    this.saveLists();
                     this.render();
                 }
             }
 
             deleteTodo(id) {
-                this.todos = this.todos.filter(t => t.id !== id);
-                this.saveTodos();
+                this.lists[this.currentListId].todos = this.getCurrentTodos().filter(t => t.id !== id);
+                this.saveLists();
                 this.render();
             }
 
@@ -385,20 +705,195 @@
             }
 
             clearCompleted() {
-                this.todos = this.todos.filter(t => !t.completed);
-                this.saveTodos();
+                this.lists[this.currentListId].todos = this.getCurrentTodos().filter(t => !t.completed);
+                this.saveLists();
                 this.render();
             }
 
             getFilteredTodos() {
+                const todos = this.getCurrentTodos();
                 switch (this.currentFilter) {
                     case 'active':
-                        return this.todos.filter(t => !t.completed);
+                        return todos.filter(t => !t.completed);
                     case 'completed':
-                        return this.todos.filter(t => t.completed);
+                        return todos.filter(t => t.completed);
                     default:
-                        return this.todos;
+                        return todos;
                 }
+            }
+
+            // List management methods
+            switchList(listId) {
+                if (this.lists[listId]) {
+                    this.currentListId = listId;
+                    this.saveCurrentListId();
+                    this.updateCurrentListDisplay();
+                    this.render();
+                }
+            }
+
+            createNewList() {
+                const nameInput = document.getElementById('newListName');
+                const name = nameInput.value.trim();
+
+                if (name === '') {
+                    nameInput.focus();
+                    return;
+                }
+
+                // Check if name already exists
+                const existingList = Object.values(this.lists).find(list => 
+                    list.name.toLowerCase() === name.toLowerCase()
+                );
+
+                if (existingList) {
+                    alert('A list with this name already exists!');
+                    nameInput.focus();
+                    return;
+                }
+
+                const listId = 'list_' + Date.now();
+                const newList = {
+                    id: listId,
+                    name: name,
+                    todos: [],
+                    createdAt: new Date().toISOString()
+                };
+
+                this.lists[listId] = newList;
+                this.currentListId = listId;
+                this.saveLists();
+                this.saveCurrentListId();
+                this.updateListSelector();
+                this.updateCurrentListDisplay();
+                this.render();
+                
+                nameInput.value = '';
+                this.closeModal('newListModal');
+            }
+
+            deleteList(listId) {
+                if (Object.keys(this.lists).length <= 1) {
+                    alert('You must have at least one list!');
+                    return;
+                }
+
+                const listName = this.lists[listId].name;
+                if (confirm(`Are you sure you want to delete "${listName}"? All todos in this list will be lost.`)) {
+                    delete this.lists[listId];
+                    
+                    // Switch to another list if we deleted the current one
+                    if (this.currentListId === listId) {
+                        this.currentListId = Object.keys(this.lists)[0];
+                        this.saveCurrentListId();
+                        this.updateCurrentListDisplay();
+                        this.render();
+                    }
+                    
+                    this.saveLists();
+                    this.updateListSelector();
+                    this.renderListManager();
+                }
+            }
+
+            renameList(listId) {
+                const currentName = this.lists[listId].name;
+                const newName = prompt('Enter new name for the list:', currentName);
+                
+                if (newName && newName.trim() !== '' && newName !== currentName) {
+                    const trimmedName = newName.trim();
+                    
+                    // Check if name already exists
+                    const existingList = Object.values(this.lists).find(list => 
+                        list.id !== listId && list.name.toLowerCase() === trimmedName.toLowerCase()
+                    );
+
+                    if (existingList) {
+                        alert('A list with this name already exists!');
+                        return;
+                    }
+
+                    this.lists[listId].name = trimmedName;
+                    this.saveLists();
+                    this.updateListSelector();
+                    this.updateCurrentListDisplay();
+                    this.renderListManager();
+                }
+            }
+
+            // UI methods
+            updateListSelector() {
+                const selector = document.getElementById('listSelector');
+                const currentOptions = Array.from(selector.options).slice(1); // Keep the first option
+                
+                // Clear existing options except the first one
+                currentOptions.forEach(option => option.remove());
+                
+                // Add lists
+                Object.values(this.lists).forEach(list => {
+                    if (list.id !== this.currentListId) {
+                        const option = document.createElement('option');
+                        option.value = list.id;
+                        option.textContent = list.name;
+                        selector.appendChild(option);
+                    }
+                });
+            }
+
+            updateCurrentListDisplay() {
+                const display = document.getElementById('currentListDisplay');
+                const currentList = this.lists[this.currentListId];
+                if (currentList) {
+                    display.textContent = currentList.name;
+                }
+            }
+
+            openModal(modalId) {
+                document.getElementById(modalId).style.display = 'block';
+                if (modalId === 'newListModal') {
+                    setTimeout(() => {
+                        document.getElementById('newListName').focus();
+                    }, 100);
+                }
+            }
+
+            closeModal(modalId) {
+                document.getElementById(modalId).style.display = 'none';
+                if (modalId === 'newListModal') {
+                    document.getElementById('newListName').value = '';
+                }
+            }
+
+            openManageListsModal() {
+                this.renderListManager();
+                this.openModal('manageListsModal');
+            }
+
+            renderListManager() {
+                const container = document.getElementById('listManager');
+                const lists = Object.values(this.lists).sort((a, b) => 
+                    new Date(a.createdAt) - new Date(b.createdAt)
+                );
+
+                container.innerHTML = lists.map(list => `
+                    <div class="list-item">
+                        <div class="list-name ${list.id === this.currentListId ? 'current' : ''}">
+                            ${this.escapeHtml(list.name)}
+                            ${list.id === this.currentListId ? ' (current)' : ''}
+                        </div>
+                        <div class="list-actions">
+                            ${list.id !== this.currentListId ? 
+                                `<button class="list-action-btn" onclick="app.switchList('${list.id}'); app.closeModal('manageListsModal')">Switch</button>` : 
+                                ''
+                            }
+                            <button class="list-action-btn" onclick="app.renameList('${list.id}')">Rename</button>
+                            ${Object.keys(this.lists).length > 1 ? 
+                                `<button class="list-action-btn delete" onclick="app.deleteList('${list.id}')">Delete</button>` : 
+                                ''
+                            }
+                        </div>
+                    </div>
+                `).join('');
             }
 
             formatDate(dateString) {
@@ -419,8 +914,9 @@
                 const clearSection = document.getElementById('clearSection');
                 
                 const filteredTodos = this.getFilteredTodos();
-                const activeTodos = this.todos.filter(t => !t.completed);
-                const completedTodos = this.todos.filter(t => t.completed);
+                const allTodos = this.getCurrentTodos();
+                const activeTodos = allTodos.filter(t => !t.completed);
+                const completedTodos = allTodos.filter(t => t.completed);
 
                 // Update stats
                 const activeCount = activeTodos.length;
@@ -431,11 +927,14 @@
 
                 // Render todos
                 if (filteredTodos.length === 0) {
+                    const currentListName = this.lists[this.currentListId]?.name || 'this list';
                     todoList.innerHTML = `
                         <div class="empty-state">
                             <div style="font-size: 4rem; margin-bottom: 20px;">📝</div>
                             <h3>No todos ${this.currentFilter === 'all' ? 'yet' : 'in this filter'}</h3>
-                            <p>${this.currentFilter === 'all' ? 'Add a new todo to get started!' : `Switch to "All" to see your todos.`}</p>
+                            <p>${this.currentFilter === 'all' ? 
+                                `Add a new todo to "${currentListName}" to get started!` : 
+                                `Switch to "All" to see your todos.`}</p>
                         </div>
                     `;
                 } else {
@@ -457,18 +956,48 @@
                 return div.innerHTML;
             }
 
-            saveTodos() {
-                localStorage.setItem('todos', JSON.stringify(this.todos));
+            // Storage methods
+            saveLists() {
+                localStorage.setItem('todoLists', JSON.stringify(this.lists));
             }
 
-            loadTodos() {
+            loadLists() {
                 try {
-                    const stored = localStorage.getItem('todos');
-                    return stored ? JSON.parse(stored) : [];
+                    const stored = localStorage.getItem('todoLists');
+                    if (stored) {
+                        return JSON.parse(stored);
+                    }
+                    
+                    // Migration: check for old todos format
+                    const oldTodos = localStorage.getItem('todos');
+                    if (oldTodos) {
+                        const todos = JSON.parse(oldTodos);
+                        const defaultList = {
+                            id: 'default',
+                            name: 'My List',
+                            todos: todos,
+                            createdAt: new Date().toISOString()
+                        };
+                        const lists = { 'default': defaultList };
+                        this.saveLists = () => localStorage.setItem('todoLists', JSON.stringify(lists));
+                        this.saveLists();
+                        localStorage.removeItem('todos'); // Clean up old format
+                        return lists;
+                    }
+                    
+                    return {};
                 } catch (error) {
-                    console.warn('Failed to load todos from localStorage:', error);
-                    return [];
+                    console.warn('Failed to load lists from localStorage:', error);
+                    return {};
                 }
+            }
+
+            saveCurrentListId() {
+                localStorage.setItem('currentListId', this.currentListId);
+            }
+
+            getCurrentListId() {
+                return localStorage.getItem('currentListId') || 'default';
             }
         }
 
