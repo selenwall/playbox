@@ -525,9 +525,9 @@
         <div class="app-subtitle">Organisera dina projekt och resor</div>
         
         <div class="list-chips">
-            <div class="chip selected">Värmdo</div>
-            <div class="chip">Hem</div>
-            <div class="chip">Jobb</div>
+            <div class="chip selected" onclick="selectList('varmdo')">Värmdö</div>
+            <div class="chip" onclick="selectList('hem')">Hem</div>
+            <div class="chip" onclick="selectList('jobb')">Jobb</div>
         </div>
         
         <div class="action-buttons">
@@ -573,29 +573,99 @@
     </main>
 
     <script>
-        let tasks = [
-            {
-                id: 1,
-                title: "Middag William",
-                completed: false,
-                category: "Mat",
-                priority: "high",
-                time: "Idag"
-            },
-            {
-                id: 2,
-                title: "Frukost barnen",
-                completed: false,
-                category: "Mat",
-                priority: "medium",
-                time: "Idag"
-            }
-        ];
+        // Task lists for each category
+        let taskLists = {
+            varmdo: [
+                {
+                    id: 1,
+                    title: "Middag William",
+                    completed: false,
+                    category: "Mat",
+                    priority: "high",
+                    time: "Idag"
+                },
+                {
+                    id: 2,
+                    title: "Frukost barnen",
+                    completed: false,
+                    category: "Mat",
+                    priority: "medium",
+                    time: "Idag"
+                },
+                {
+                    id: 3,
+                    title: "Packa väskan",
+                    completed: true,
+                    category: "Resa",
+                    priority: "medium",
+                    time: "Igår"
+                }
+            ],
+            hem: [
+                {
+                    id: 4,
+                    title: "Städa vardagsrummet",
+                    completed: false,
+                    category: "Städning",
+                    priority: "medium",
+                    time: "Idag"
+                },
+                {
+                    id: 5,
+                    title: "Handla mat",
+                    completed: false,
+                    category: "Inköp",
+                    priority: "high",
+                    time: "Idag"
+                },
+                {
+                    id: 6,
+                    title: "Betala räkningar",
+                    completed: true,
+                    category: "Ekonomi",
+                    priority: "high",
+                    time: "Igår"
+                }
+            ],
+            jobb: [
+                {
+                    id: 7,
+                    title: "Slutför projektet",
+                    completed: false,
+                    category: "Projekt",
+                    priority: "high",
+                    time: "Idag"
+                },
+                {
+                    id: 8,
+                    title: "Skicka rapport",
+                    completed: false,
+                    category: "Rapport",
+                    priority: "medium",
+                    time: "Imorgon"
+                },
+                {
+                    id: 9,
+                    title: "Möte med klienten",
+                    completed: true,
+                    category: "Möte",
+                    priority: "high",
+                    time: "Igår"
+                }
+            ]
+        };
         
+        let currentList = 'varmdo';
         let currentTab = 'all';
+        
+        // Get current tasks based on selected list
+        function getCurrentTasks() {
+            return taskLists[currentList] || [];
+        }
         
         function renderTasks() {
             const tasksList = document.getElementById('tasksList');
+            const tasks = getCurrentTasks();
             let filteredTasks = tasks;
             
             if (currentTab === 'active') {
@@ -636,6 +706,7 @@
         }
         
         function updateProgress() {
+            const tasks = getCurrentTasks();
             const total = tasks.length;
             const completed = tasks.filter(task => task.completed).length;
             const remaining = total - completed;
@@ -660,7 +731,7 @@
                     time: "Idag"
                 };
                 
-                tasks.unshift(newTask);
+                taskLists[currentList].unshift(newTask);
                 input.value = '';
                 renderTasks();
                 
@@ -672,6 +743,7 @@
         }
         
         function toggleTask(id) {
+            const tasks = getCurrentTasks();
             const task = tasks.find(t => t.id === id);
             if (task) {
                 task.completed = !task.completed;
@@ -687,7 +759,7 @@
         function deleteTask(id) {
             // Material Design style confirmation would be a Snackbar, but using alert for now
             if (confirm('Ta bort denna uppgift?')) {
-                tasks = tasks.filter(t => t.id !== id);
+                taskLists[currentList] = taskLists[currentList].filter(t => t.id !== id);
                 renderTasks();
                 
                 if (navigator.vibrate) {
@@ -697,6 +769,7 @@
         }
         
         function editTask(id) {
+            const tasks = getCurrentTasks();
             const task = tasks.find(t => t.id === id);
             if (task) {
                 const newTitle = prompt('Redigera uppgift:', task.title);
@@ -722,6 +795,25 @@
             
             currentTab = tab;
             renderTasks();
+        }
+        
+        function selectList(listName) {
+            // Remove selected class from all chips
+            document.querySelectorAll('.chip').forEach(chip => chip.classList.remove('selected'));
+            
+            // Add selected class to clicked chip
+            event.target.classList.add('selected');
+            
+            // Update current list
+            currentList = listName;
+            
+            // Re-render tasks and progress
+            renderTasks();
+            
+            // Haptic feedback
+            if (navigator.vibrate) {
+                navigator.vibrate(50);
+            }
         }
         
         function switchList() {
