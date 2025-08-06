@@ -900,7 +900,7 @@
                     completed: false,
                     category: "Mat",
                     priority: "high",
-                    time: "Idag"
+                    time: null
                 },
                 {
                     id: 2,
@@ -926,7 +926,7 @@
                     completed: false,
                     category: "Städning",
                     priority: "medium",
-                    time: "Idag"
+                    time: null
                 },
                 {
                     id: 5,
@@ -952,7 +952,7 @@
                     completed: false,
                     category: "Projekt",
                     priority: "high",
-                    time: "Idag"
+                    time: null
                 },
                 {
                     id: 8,
@@ -1009,7 +1009,7 @@
                             <div class="task-title ${task.completed ? 'completed' : ''}">${task.title}</div>
                             <div class="task-meta">
                                 <div class="task-category">${task.category}</div>
-                                <div class="task-time">${task.time}</div>
+                                ${task.time ? `<div class="task-time">${task.time}</div>` : ''}
                             </div>
                         </div>
                         <div class="task-actions">
@@ -1035,18 +1035,114 @@
             document.getElementById('itemsLeft').textContent = `${remaining} kvar`;
         }
         
+        function parseTaskInput(input) {
+            // Look for @ symbol followed by date
+            const atIndex = input.lastIndexOf('@');
+            
+            if (atIndex === -1) {
+                // No @ symbol found, return original title with no due date
+                return { title: input, dueDate: null };
+            }
+            
+            const title = input.substring(0, atIndex).trim();
+            const dateStr = input.substring(atIndex + 1).trim();
+            
+            if (!dateStr) {
+                // @ symbol found but no date, return title without @
+                return { title: title, dueDate: null };
+            }
+            
+            const parsedDate = parseDateExpression(dateStr);
+            return { title: title, dueDate: parsedDate };
+        }
+        
+        function parseDateExpression(dateStr) {
+            const lowerDateStr = dateStr.toLowerCase();
+            const today = new Date();
+            
+            // Handle "today" / "idag"
+            if (lowerDateStr === 'today' || lowerDateStr === 'idag') {
+                return formatDate(today);
+            }
+            
+            // Handle "tomorrow" / "imorgon"
+            if (lowerDateStr === 'tomorrow' || lowerDateStr === 'imorgon') {
+                const tomorrow = new Date(today);
+                tomorrow.setDate(today.getDate() + 1);
+                return formatDate(tomorrow);
+            }
+            
+            // Handle numeric date format YYYYMMDD
+            if (/^\d{8}$/.test(dateStr)) {
+                const year = parseInt(dateStr.substring(0, 4));
+                const month = parseInt(dateStr.substring(4, 6)) - 1; // Month is 0-indexed
+                const day = parseInt(dateStr.substring(6, 8));
+                const date = new Date(year, month, day);
+                
+                if (!isNaN(date.getTime())) {
+                    return formatDate(date);
+                }
+            }
+            
+            // Handle weekdays (Swedish and English)
+            const weekdays = {
+                'monday': 1, 'måndag': 1,
+                'tuesday': 2, 'tisdag': 2,
+                'wednesday': 3, 'onsdag': 3,
+                'thursday': 4, 'torsdag': 4,
+                'friday': 5, 'fredag': 5,
+                'saturday': 6, 'lördag': 6,
+                'sunday': 0, 'söndag': 0
+            };
+            
+            const targetDay = weekdays[lowerDateStr];
+            if (targetDay !== undefined) {
+                const nextDate = getNextWeekday(today, targetDay);
+                return formatDate(nextDate);
+            }
+            
+            // If no pattern matches, return the original string
+            return dateStr;
+        }
+        
+        function getNextWeekday(fromDate, targetDay) {
+            const currentDay = fromDate.getDay();
+            let daysToAdd = targetDay - currentDay;
+            
+            // If target day is today or in the past this week, go to next week
+            if (daysToAdd <= 0) {
+                daysToAdd += 7;
+            }
+            
+            const nextDate = new Date(fromDate);
+            nextDate.setDate(fromDate.getDate() + daysToAdd);
+            return nextDate;
+        }
+        
+        function formatDate(date) {
+            const options = { 
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric',
+                locale: 'sv-SE'
+            };
+            return date.toLocaleDateString('sv-SE', options);
+        }
+        
         function addTask() {
             const input = document.getElementById('taskInput');
-            const title = input.value.trim();
+            const rawInput = input.value.trim();
             
-            if (title) {
+            if (rawInput) {
+                const { title, dueDate } = parseTaskInput(rawInput);
+                
                 const newTask = {
                     id: Date.now(),
                     title: title,
                     completed: false,
                     category: "Allmänt",
                     priority: "medium",
-                    time: "Idag"
+                    time: dueDate || null  // No default due date
                 };
                 
                 taskLists[currentList].unshift(newTask);
