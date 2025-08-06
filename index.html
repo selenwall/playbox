@@ -311,14 +311,7 @@
             gap: 12px;
         }
         
-        .task-category {
-            background: #e3f2fd;
-            color: #1976d2;
-            padding: 2px 8px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 500;
-        }
+
         
         .task-time {
             color: #757575;
@@ -892,86 +885,7 @@
 
     <script>
         // Task lists for each category
-        let taskLists = {
-            varmdo: [
-                {
-                    id: 1,
-                    title: "Middag William",
-                    completed: false,
-                    category: "Mat",
-                    priority: "high",
-                    time: null
-                },
-                {
-                    id: 2,
-                    title: "Frukost barnen",
-                    completed: false,
-                    category: "Mat",
-                    priority: "medium",
-                    time: "Idag"
-                },
-                {
-                    id: 3,
-                    title: "Packa väskan",
-                    completed: true,
-                    category: "Resa",
-                    priority: "medium",
-                    time: "Igår"
-                }
-            ],
-            hem: [
-                {
-                    id: 4,
-                    title: "Städa vardagsrummet",
-                    completed: false,
-                    category: "Städning",
-                    priority: "medium",
-                    time: null
-                },
-                {
-                    id: 5,
-                    title: "Handla mat",
-                    completed: false,
-                    category: "Inköp",
-                    priority: "high",
-                    time: "Idag"
-                },
-                {
-                    id: 6,
-                    title: "Betala räkningar",
-                    completed: true,
-                    category: "Ekonomi",
-                    priority: "high",
-                    time: "Igår"
-                }
-            ],
-            jobb: [
-                {
-                    id: 7,
-                    title: "Slutför projektet",
-                    completed: false,
-                    category: "Projekt",
-                    priority: "high",
-                    time: null
-                },
-                {
-                    id: 8,
-                    title: "Skicka rapport",
-                    completed: false,
-                    category: "Rapport",
-                    priority: "medium",
-                    time: "Imorgon"
-                },
-                {
-                    id: 9,
-                    title: "Möte med klienten",
-                    completed: true,
-                    category: "Möte",
-                    priority: "high",
-                    time: "Igår"
-                }
-            ]
-        };
+        let taskLists = {};
         
         let currentList = 'varmdo';
         let currentTab = 'all';
@@ -1008,7 +922,6 @@
                         <div class="task-content">
                             <div class="task-title ${task.completed ? 'completed' : ''}">${task.title}</div>
                             <div class="task-meta">
-                                <div class="task-category">${task.category}</div>
                                 ${task.time ? `<div class="task-time">${task.time}</div>` : ''}
                             </div>
                         </div>
@@ -1121,10 +1034,10 @@
         
         function formatDate(date) {
             const options = { 
+                weekday: 'long',
                 year: 'numeric', 
                 month: 'short', 
-                day: 'numeric',
-                locale: 'sv-SE'
+                day: 'numeric'
             };
             return date.toLocaleDateString('sv-SE', options);
         }
@@ -1140,7 +1053,6 @@
                     id: Date.now(),
                     title: title,
                     completed: false,
-                    category: "Allmänt",
                     priority: "medium",
                     time: dueDate || null  // No default due date
                 };
@@ -1463,7 +1375,7 @@
             tasks.forEach((task, index) => {
                 const status = task.completed ? '✓' : '○';
                 exportText += `${status} ${task.title}\n`;
-                exportText += `   Kategori: ${task.category} | Prioritet: ${task.priority} | ${task.time}\n\n`;
+                exportText += `   Prioritet: ${task.priority}${task.time ? ` | ${task.time}` : ''}\n\n`;
             });
             
             // Create and download file
@@ -1558,6 +1470,79 @@
         
         // Initialize the app
         document.addEventListener('DOMContentLoaded', function() {
+            // Initialize task lists with proper date formatting
+            taskLists = {
+                varmdo: [
+                    {
+                        id: 1,
+                        title: "Middag William",
+                        completed: false,
+                        priority: "high",
+                        time: null
+                    },
+                    {
+                        id: 2,
+                        title: "Frukost barnen",
+                        completed: false,
+                        priority: "medium",
+                        time: formatDate(new Date())
+                    },
+                    {
+                        id: 3,
+                        title: "Packa väskan",
+                        completed: true,
+                        priority: "medium",
+                        time: formatDate(new Date(Date.now() - 86400000)) // Yesterday
+                    }
+                ],
+                hem: [
+                    {
+                        id: 4,
+                        title: "Städa vardagsrummet",
+                        completed: false,
+                        priority: "medium",
+                        time: null
+                    },
+                    {
+                        id: 5,
+                        title: "Handla mat",
+                        completed: false,
+                        priority: "high",
+                        time: formatDate(new Date())
+                    },
+                    {
+                        id: 6,
+                        title: "Betala räkningar",
+                        completed: true,
+                        priority: "high",
+                        time: formatDate(new Date(Date.now() - 86400000)) // Yesterday
+                    }
+                ],
+                jobb: [
+                    {
+                        id: 7,
+                        title: "Slutför projektet",
+                        completed: false,
+                        priority: "high",
+                        time: null
+                    },
+                    {
+                        id: 8,
+                        title: "Skicka rapport",
+                        completed: false,
+                        priority: "medium",
+                        time: formatDate(new Date(Date.now() + 86400000)) // Tomorrow
+                    },
+                    {
+                        id: 9,
+                        title: "Möte med klienten",
+                        completed: true,
+                        priority: "high",
+                        time: formatDate(new Date(Date.now() - 86400000)) // Yesterday
+                    }
+                ]
+            };
+            
             renderTasks();
             
             // Close modals when clicking outside
