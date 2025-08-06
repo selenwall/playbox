@@ -1059,6 +1059,7 @@
                 
                 taskLists[currentList].unshift(newTask);
                 input.value = '';
+                saveToLocalStorage();
                 renderTasks();
                 
                 // Haptic feedback simulation
@@ -1073,6 +1074,7 @@
             const task = tasks.find(t => t.id === id);
             if (task) {
                 task.completed = !task.completed;
+                saveToLocalStorage();
                 renderTasks();
                 
                 // Haptic feedback
@@ -1086,6 +1088,7 @@
             // Material Design style confirmation would be a Snackbar, but using alert for now
             if (confirm('Ta bort denna uppgift?')) {
                 taskLists[currentList] = taskLists[currentList].filter(t => t.id !== id);
+                saveToLocalStorage();
                 renderTasks();
                 
                 if (navigator.vibrate) {
@@ -1101,6 +1104,7 @@
                 const newTitle = prompt('Redigera uppgift:', task.title);
                 if (newTitle && newTitle.trim()) {
                     task.title = newTitle.trim();
+                    saveToLocalStorage();
                     renderTasks();
                 }
             }
@@ -1132,6 +1136,9 @@
             
             // Update current list
             currentList = listName;
+            
+            // Save current list selection
+            saveToLocalStorage();
             
             // Re-render tasks and progress
             renderTasks();
@@ -1237,6 +1244,9 @@
                 }
             });
             
+            // Save current list selection
+            saveToLocalStorage();
+            
             renderTasks();
             closeSwitchListModal();
             
@@ -1277,6 +1287,9 @@
                 
                 // Create new empty list
                 taskLists[listKey] = [];
+                
+                // Save new list to localStorage
+                saveToLocalStorage();
                 
                 // Add chip to UI
                 const chipsContainer = document.querySelector('.list-chips');
@@ -1428,6 +1441,7 @@
             
             if (confirm(`Ta bort ${completedCount} färdiga uppgifter?`)) {
                 taskLists[currentList] = tasks.filter(task => !task.completed);
+                saveToLocalStorage();
                 renderTasks();
                 
                 if (navigator.vibrate) {
@@ -1460,6 +1474,9 @@
                 currentList = Object.keys(taskLists)[0];
                 document.querySelector('.chip').classList.add('selected');
                 
+                // Save changes to localStorage
+                saveToLocalStorage();
+                
                 renderTasks();
                 
                 if (navigator.vibrate) {
@@ -1468,10 +1485,80 @@
             }
         }
         
+        // Local Storage Functions
+        function saveToLocalStorage() {
+            try {
+                localStorage.setItem('todoLists', JSON.stringify(taskLists));
+                localStorage.setItem('currentList', currentList);
+            } catch (error) {
+                console.error('Failed to save to localStorage:', error);
+            }
+        }
+        
+        function loadFromLocalStorage() {
+            try {
+                const savedTaskLists = localStorage.getItem('todoLists');
+                const savedCurrentList = localStorage.getItem('currentList');
+                
+                if (savedTaskLists) {
+                    taskLists = JSON.parse(savedTaskLists);
+                    
+                    // Restore dynamically created list chips
+                    restoreListChips();
+                }
+                
+                if (savedCurrentList && taskLists[savedCurrentList]) {
+                    currentList = savedCurrentList;
+                    
+                    // Update chip selection
+                    document.querySelectorAll('.chip').forEach(chip => {
+                        chip.classList.remove('selected');
+                        if (chip.textContent === getListDisplayName(savedCurrentList)) {
+                            chip.classList.add('selected');
+                        }
+                    });
+                }
+                
+                return savedTaskLists !== null;
+            } catch (error) {
+                console.error('Failed to load from localStorage:', error);
+                return false;
+            }
+        }
+        
+        function restoreListChips() {
+            const chipsContainer = document.querySelector('.list-chips');
+            const defaultLists = ['varmdo', 'hem', 'jobb'];
+            
+            // Add chips for any custom lists that aren't in the default set
+            Object.keys(taskLists).forEach(listKey => {
+                if (!defaultLists.includes(listKey)) {
+                    const listName = getListDisplayName(listKey);
+                    
+                    // Check if chip already exists
+                    const existingChip = Array.from(chipsContainer.children).find(chip => 
+                        chip.textContent === listName
+                    );
+                    
+                    if (!existingChip) {
+                        const newChip = document.createElement('div');
+                        newChip.className = 'chip';
+                        newChip.textContent = listName;
+                        newChip.onclick = () => selectList(listKey);
+                        chipsContainer.appendChild(newChip);
+                    }
+                }
+            });
+        }
+
         // Initialize the app
         document.addEventListener('DOMContentLoaded', function() {
-            // Initialize task lists with proper date formatting
-            taskLists = {
+            // Try to load from localStorage first
+            const hasData = loadFromLocalStorage();
+            
+            // If no saved data, initialize with default task lists
+            if (!hasData) {
+                taskLists = {
                 varmdo: [
                     {
                         id: 1,
@@ -1542,6 +1629,7 @@
                     }
                 ]
             };
+            }
             
             renderTasks();
             
