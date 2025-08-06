@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Todo App</title>
+    <title>Todo Lists - Organisera dina projekt och resor</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
@@ -78,9 +78,10 @@
         .app-bar h1 {
             font-size: 20px;
             font-weight: 500;
-            margin-bottom: 4px;
+            margin-bottom: 8px;
             display: flex;
             align-items: center;
+            justify-content: space-between;
             gap: 8px;
         }
 
@@ -98,6 +99,75 @@
 
         .menu-icon:hover {
             background: rgba(255, 255, 255, 0.1);
+        }
+
+        .category-buttons {
+            display: flex;
+            gap: 12px;
+            margin: 16px 0;
+            flex-wrap: wrap;
+        }
+
+        .category-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: 400;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .category-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-1px);
+        }
+
+        .category-btn.active {
+            background: rgba(255, 255, 255, 0.9);
+            color: var(--primary-color);
+        }
+
+        .list-management {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .list-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 4px;
+            padding: 8px 16px;
+            font-size: 12px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+        }
+
+        .list-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .task-stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            border-bottom: 2px solid var(--primary-color);
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .remaining-count {
+            color: var(--primary-color);
+            font-weight: 500;
         }
 
         .theme-toggle {
@@ -684,9 +754,25 @@
         }
 
         .empty-state {
-            text-align: center;
-            padding: 48px 16px;
+            padding: 24px 16px;
             color: #757575;
+        }
+
+        .empty-state input {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 0;
+            font-size: 16px;
+            color: var(--text-secondary);
+            background: transparent;
+            outline: none;
+            font-family: inherit;
+        }
+
+        .empty-state input::placeholder {
+            color: var(--text-disabled);
+            font-weight: 300;
         }
 
         .empty-state .material-icons {
@@ -1084,62 +1170,45 @@
         <div class="app-bar">
             <h1>
                 <span class="material-icons menu-icon" onclick="app.toggleDrawer()">menu</span>
-                <span class="material-icons">assignment</span>
                 Todo Lists
                 <button class="theme-toggle" id="themeToggle" onclick="app.toggleTheme()" aria-label="Toggle dark mode">
-                    <span class="material-icons">dark_mode</span>
+                    <span class="material-icons">more_vert</span>
                 </button>
             </h1>
-            <p>Organize your projects and trips</p>
+            <p>Organisera dina projekt och resor</p>
+            
+            <div class="category-buttons">
+                <button class="category-btn" onclick="app.selectCategory('värmdo')">Värmdo</button>
+                <button class="category-btn" onclick="app.selectCategory('hem')">Hem</button>
+                <button class="category-btn" onclick="app.selectCategory('jobb')">Jobb</button>
+            </div>
             
             <div class="list-management">
-                <div class="current-list" id="currentListDisplay">My List</div>
-                <div class="list-controls">
-                    <select class="list-dropdown" id="listSelector">
-                        <option value="">Switch List</option>
-                    </select>
-                    <button class="list-btn ripple" id="newListBtn">New List</button>
-                    <button class="list-btn ripple" id="manageListsBtn">Manage</button>
-                </div>
+                <button class="list-btn" id="switchListBtn" onclick="app.openModal('newListModal')">BYTA LISTA</button>
+                <button class="list-btn" id="newListBtn" onclick="app.openModal('newListModal')">NY LISTA</button>
             </div>
         </div>
         
         <div class="content-card">
-            <div class="input-section">
-                <div class="input-container">
-                    <div class="input-wrapper">
-                        <input type="text" id="todoInput" placeholder=" " maxlength="200" 
-                               aria-describedby="todoInputLabel" autocomplete="off">
-                        <label class="input-label" id="todoInputLabel">What needs to be done?</label>
-                    </div>
-                    <button id="addBtn">Add Todo</button>
-                </div>
+            <div class="task-stats">
+                <span id="taskProgress">0 av 0 uppgifter klara</span>
+                <span id="remainingTasks" class="remaining-count">0 kvar</span>
             </div>
             
             <div class="filters">
-                <button class="filter-btn active" data-filter="all">All</button>
-                <button class="filter-btn" data-filter="active">Active</button>
-                <button class="filter-btn" data-filter="completed">Completed</button>
-            </div>
-
-            <div class="search-section">
-                <div class="search-container">
-                    <span class="material-icons search-icon">search</span>
-                    <input type="text" id="searchInput" placeholder="Search todos..." maxlength="100"
-                           aria-label="Search todos" autocomplete="off">
-                    <button class="clear-search" id="clearSearch" style="display: none;" aria-label="Clear search">
-                        <span class="material-icons">clear</span>
-                    </button>
-                </div>
+                <button class="filter-btn active" data-filter="all">ALLA</button>
+                <button class="filter-btn" data-filter="active">AKTIVA</button>
+                <button class="filter-btn" data-filter="completed">KLARA</button>
             </div>
             
             <div class="todos-section">
-                <div class="stats" id="stats">0 items left</div>
-                <div id="todoList" role="list" aria-label="Todo items"></div>
-                <div id="announcements" aria-live="polite" aria-atomic="true" class="sr-only"></div>
-                <div class="clear-completed" id="clearSection" style="display: none;">
-                    <button class="clear-btn" id="clearCompleted">Clear Completed</button>
+                <div id="todoList" role="list" aria-label="Todo items">
+                    <div class="empty-state">
+                        <input type="text" id="todoInput" placeholder="Lägg till uppgift..." maxlength="200" 
+                               aria-label="Lägg till uppgift" autocomplete="off">
+                    </div>
                 </div>
+                <div id="announcements" aria-live="polite" aria-atomic="true" class="sr-only"></div>
             </div>
             
         </div>
@@ -1207,23 +1276,21 @@
             }
 
             bindEvents() {
-                const todoInput = document.getElementById('todoInput');
-                const addBtn = document.getElementById('addBtn');
                 const fabBtn = document.getElementById('fabBtn');
                 const filterBtns = document.querySelectorAll('.filter-btn');
-                const clearBtn = document.getElementById('clearCompleted');
-                const listSelector = document.getElementById('listSelector');
                 const newListBtn = document.getElementById('newListBtn');
-                const manageListsBtn = document.getElementById('manageListsBtn');
                 const newListName = document.getElementById('newListName');
-                const searchInput = document.getElementById('searchInput');
-                const clearSearch = document.getElementById('clearSearch');
 
-                addBtn.addEventListener('click', () => this.addTodo());
-                fabBtn.addEventListener('click', () => this.addTodo());
-                todoInput.addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter') this.addTodo();
+                // Use event delegation for dynamically created todo input
+                document.addEventListener('keypress', (e) => {
+                    if (e.target.id === 'todoInput' && e.key === 'Enter') {
+                        this.addTodo();
+                    }
                 });
+
+                if (fabBtn) {
+                    fabBtn.addEventListener('click', () => this.addTodo());
+                }
 
                 filterBtns.forEach(btn => {
                     btn.addEventListener('click', (e) => {
@@ -1231,30 +1298,15 @@
                     });
                 });
 
-                clearBtn.addEventListener('click', () => this.clearCompleted());
-                
-                listSelector.addEventListener('change', (e) => {
-                    if (e.target.value) {
-                        this.switchList(e.target.value);
-                        e.target.value = ''; // Reset selector
-                    }
-                });
+                if (newListBtn) {
+                    newListBtn.addEventListener('click', () => this.openModal('newListModal'));
+                }
 
-                newListBtn.addEventListener('click', () => this.openModal('newListModal'));
-                manageListsBtn.addEventListener('click', () => this.openManageListsModal());
-
-                newListName.addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter') this.createNewList();
-                });
-
-                // Search functionality
-                searchInput.addEventListener('input', (e) => {
-                    this.setSearchTerm(e.target.value);
-                });
-
-                clearSearch.addEventListener('click', () => {
-                    this.clearSearch();
-                });
+                if (newListName) {
+                    newListName.addEventListener('keypress', (e) => {
+                        if (e.key === 'Enter') this.createNewList();
+                    });
+                }
 
                 // Keyboard navigation
                 document.addEventListener('keydown', (e) => this.handleGlobalKeydown(e));
@@ -1804,52 +1856,41 @@
 
             render() {
                 const todoList = document.getElementById('todoList');
-                const stats = document.getElementById('stats');
-                const clearSection = document.getElementById('clearSection');
+                const taskProgress = document.getElementById('taskProgress');
+                const remainingTasks = document.getElementById('remainingTasks');
                 
                 const filteredTodos = this.getFilteredTodos();
                 const allTodos = this.getCurrentTodos();
                 const activeTodos = allTodos.filter(t => !t.completed);
                 const completedTodos = allTodos.filter(t => t.completed);
 
-                // Update stats
+                // Update Swedish stats
+                const totalTasks = allTodos.length;
+                const completedCount = completedTodos.length;
                 const activeCount = activeTodos.length;
-                stats.textContent = `${activeCount} item${activeCount !== 1 ? 's' : ''} left`;
-
-                // Show/hide clear completed button
-                clearSection.style.display = completedTodos.length > 0 ? 'block' : 'none';
+                
+                if (taskProgress) {
+                    taskProgress.textContent = `${completedCount} av ${totalTasks} uppgifter klara`;
+                }
+                if (remainingTasks) {
+                    remainingTasks.textContent = `${activeCount} kvar`;
+                }
 
                 // Render todos
                 if (filteredTodos.length === 0) {
-                    const currentListName = this.lists[this.currentListId]?.name || 'this list';
-                    const hasSearchTerm = this.searchTerm.trim() !== '';
-                    const hasActiveTodos = this.getCurrentTodos().length > 0;
-                    
-                    let icon, title, message;
-                    
-                    if (hasSearchTerm) {
-                        icon = 'search_off';
-                        title = 'No results found';
-                        message = `No todos match "${this.searchTerm}". Try a different search term.`;
-                    } else if (this.currentFilter !== 'all') {
-                        icon = 'filter_list_off';
-                        title = `No ${this.currentFilter} todos`;
-                        message = hasActiveTodos ? 'Switch to "All" to see your todos.' : `Add a new todo to "${currentListName}" to get started!`;
-                    } else {
-                        icon = 'assignment';
-                        title = 'No todos yet';
-                        message = `Add a new todo to "${currentListName}" to get started!`;
-                    }
-                    
                     todoList.innerHTML = `
                         <div class="empty-state">
-                            <span class="material-icons">${icon}</span>
-                            <h3>${title}</h3>
-                            <p>${message}</p>
+                            <input type="text" id="todoInput" placeholder="Lägg till uppgift..." maxlength="200" 
+                                   aria-label="Lägg till uppgift" autocomplete="off">
                         </div>
                     `;
                 } else {
-                    todoList.innerHTML = filteredTodos.map(todo => `
+                    todoList.innerHTML = `
+                        <div class="empty-state">
+                            <input type="text" id="todoInput" placeholder="Lägg till uppgift..." maxlength="200" 
+                                   aria-label="Lägg till uppgift" autocomplete="off">
+                        </div>
+                    ` + filteredTodos.map(todo => `
                         <div class="todo-item" data-todo-id="${todo.id}" role="listitem">
                             <button class="todo-checkbox ${todo.completed ? 'checked' : ''}" 
                                  onclick="app.toggleTodo(${todo.id})"
@@ -1921,6 +1962,20 @@
 
             getCurrentListId() {
                 return localStorage.getItem('currentListId') || 'default';
+            }
+
+            // Category selection
+            selectCategory(category) {
+                // Remove active class from all category buttons
+                document.querySelectorAll('.category-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                
+                // Add active class to selected button
+                event.target.classList.add('active');
+                
+                // Here you could filter todos by category or switch lists
+                console.log('Selected category:', category);
             }
 
             // Drawer methods
