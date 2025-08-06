@@ -320,6 +320,10 @@
             font-weight: 500;
         }
         
+        .task-time {
+            color: #757575;
+            font-size: 12px;
+        }
         
         .priority-indicator {
             width: 4px;
@@ -895,21 +899,24 @@
                     title: "Middag William",
                     completed: false,
                     category: "Mat",
-                    priority: "high"
+                    priority: "high",
+                    time: "Idag"
                 },
                 {
                     id: 2,
                     title: "Frukost barnen",
                     completed: false,
                     category: "Mat",
-                    priority: "medium"
+                    priority: "medium",
+                    time: "Idag"
                 },
                 {
                     id: 3,
                     title: "Packa väskan",
                     completed: true,
                     category: "Resa",
-                    priority: "medium"
+                    priority: "medium",
+                    time: "Igår"
                 }
             ],
             hem: [
@@ -918,21 +925,24 @@
                     title: "Städa vardagsrummet",
                     completed: false,
                     category: "Städning",
-                    priority: "medium"
+                    priority: "medium",
+                    time: "Idag"
                 },
                 {
                     id: 5,
                     title: "Handla mat",
                     completed: false,
                     category: "Inköp",
-                    priority: "high"
+                    priority: "high",
+                    time: "Idag"
                 },
                 {
                     id: 6,
                     title: "Betala räkningar",
                     completed: true,
                     category: "Ekonomi",
-                    priority: "high"
+                    priority: "high",
+                    time: "Igår"
                 }
             ],
             jobb: [
@@ -941,21 +951,24 @@
                     title: "Slutför projektet",
                     completed: false,
                     category: "Projekt",
-                    priority: "high"
+                    priority: "high",
+                    time: "Idag"
                 },
                 {
                     id: 8,
                     title: "Skicka rapport",
                     completed: false,
                     category: "Rapport",
-                    priority: "medium"
+                    priority: "medium",
+                    time: "Imorgon"
                 },
                 {
                     id: 9,
                     title: "Möte med klienten",
                     completed: true,
                     category: "Möte",
-                    priority: "high"
+                    priority: "high",
+                    time: "Igår"
                 }
             ]
         };
@@ -996,6 +1009,7 @@
                             <div class="task-title ${task.completed ? 'completed' : ''}">${task.title}</div>
                             <div class="task-meta">
                                 <div class="task-category">${task.category}</div>
+                                <div class="task-time">${task.time}</div>
                             </div>
                         </div>
                         <div class="task-actions">
@@ -1031,7 +1045,8 @@
                     title: title,
                     completed: false,
                     category: "Allmänt",
-                    priority: "medium"
+                    priority: "medium",
+                    time: "Idag"
                 };
                 
                 taskLists[currentList].unshift(newTask);
