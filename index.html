@@ -501,6 +501,261 @@
             width: 300px;
             height: 300px;
         }
+        
+        /* Side Menu */
+        .side-menu {
+            position: fixed;
+            top: 0;
+            left: -300px;
+            width: 300px;
+            height: 100vh;
+            background: white;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            transition: left 0.3s ease;
+            z-index: 100;
+            padding-top: 24px;
+        }
+        
+        .side-menu.open {
+            left: 0;
+        }
+        
+        .menu-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0,0,0,0.5);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 99;
+        }
+        
+        .menu-overlay.open {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .menu-header {
+            padding: 20px;
+            background: #1976d2;
+            color: white;
+        }
+        
+        .menu-title {
+            font-size: 20px;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+        
+        .menu-subtitle {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+        
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 16px 20px;
+            border-bottom: 1px solid #f0f0f0;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .menu-item:hover {
+            background: #f5f5f5;
+        }
+        
+        .menu-item:active {
+            background: #eeeeee;
+        }
+        
+        .menu-icon-item {
+            font-size: 20px;
+            margin-right: 16px;
+            width: 24px;
+            text-align: center;
+        }
+        
+        .menu-text {
+            font-size: 16px;
+            color: #212121;
+        }
+        
+        /* More Menu */
+        .more-menu {
+            position: absolute;
+            top: 60px;
+            right: 16px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            opacity: 0;
+            visibility: hidden;
+            transform: scale(0.9);
+            transition: all 0.2s ease;
+            z-index: 50;
+            min-width: 160px;
+        }
+        
+        .more-menu.open {
+            opacity: 1;
+            visibility: visible;
+            transform: scale(1);
+        }
+        
+        .more-menu-item {
+            padding: 12px 16px;
+            cursor: pointer;
+            border-bottom: 1px solid #f0f0f0;
+            color: #212121;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+        
+        .more-menu-item:last-child {
+            border-bottom: none;
+        }
+        
+        .more-menu-item:hover {
+            background: #f5f5f5;
+        }
+        
+        .more-menu-item:active {
+            background: #eeeeee;
+        }
+        
+        /* Modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 200;
+            padding: 20px;
+        }
+        
+        .modal.open {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 8px;
+            padding: 24px;
+            max-width: 400px;
+            width: 100%;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+        
+        .modal.open .modal-content {
+            transform: scale(1);
+        }
+        
+        .modal-title {
+            font-size: 20px;
+            font-weight: 500;
+            margin-bottom: 16px;
+            color: #212121;
+        }
+        
+        .modal-list {
+            margin-bottom: 24px;
+        }
+        
+        .modal-list-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .modal-list-item:last-child {
+            border-bottom: none;
+        }
+        
+        .modal-list-item:hover {
+            background: #f8f8f8;
+        }
+        
+        .list-info {
+            flex: 1;
+        }
+        
+        .list-name {
+            font-size: 16px;
+            color: #212121;
+            margin-bottom: 4px;
+        }
+        
+        .list-count {
+            font-size: 12px;
+            color: #757575;
+        }
+        
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+        
+        .modal-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .modal-btn.cancel {
+            background: transparent;
+            color: #757575;
+        }
+        
+        .modal-btn.cancel:hover {
+            background: #f5f5f5;
+        }
+        
+        .modal-btn.primary {
+            background: #1976d2;
+            color: white;
+        }
+        
+        .modal-btn.primary:hover {
+            background: #1565c0;
+        }
+        
+        .modal-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            font-size: 16px;
+            margin-bottom: 16px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        
+        .modal-input:focus {
+            border-color: #1976d2;
+        }
     </style>
 </head>
 <body>
@@ -514,12 +769,12 @@
     <header class="app-bar">
         <div class="app-bar-top">
             <div class="app-bar-title">
-                <div class="menu-icon">☰</div>
+                <div class="menu-icon" onclick="toggleSideMenu()">☰</div>
                 <div>
                     <div class="app-title">Todo Lists</div>
                 </div>
             </div>
-            <div class="more-icon">⋮</div>
+            <div class="more-icon" onclick="toggleMoreMenu()">⋮</div>
         </div>
         
         <div class="app-subtitle">Organisera dina projekt och resor</div>
@@ -535,6 +790,69 @@
             <button class="action-btn ripple" onclick="newList()">NY LISTA</button>
         </div>
     </header>
+
+    <!-- Side Menu -->
+    <div class="menu-overlay" onclick="closeSideMenu()"></div>
+    <div class="side-menu">
+        <div class="menu-header">
+            <div class="menu-title">Todo Lists</div>
+            <div class="menu-subtitle">Hantera dina listor</div>
+        </div>
+        <div class="menu-item" onclick="showAllLists()">
+            <div class="menu-icon-item">📝</div>
+            <div class="menu-text">Alla listor</div>
+        </div>
+        <div class="menu-item" onclick="showStatistics()">
+            <div class="menu-icon-item">📊</div>
+            <div class="menu-text">Statistik</div>
+        </div>
+        <div class="menu-item" onclick="showSettings()">
+            <div class="menu-icon-item">⚙️</div>
+            <div class="menu-text">Inställningar</div>
+        </div>
+        <div class="menu-item" onclick="showHelp()">
+            <div class="menu-icon-item">❓</div>
+            <div class="menu-text">Hjälp</div>
+        </div>
+        <div class="menu-item" onclick="showAbout()">
+            <div class="menu-icon-item">ℹ️</div>
+            <div class="menu-text">Om appen</div>
+        </div>
+    </div>
+
+    <!-- More Menu -->
+    <div class="more-menu">
+        <div class="more-menu-item" onclick="sortTasks()">Sortera uppgifter</div>
+        <div class="more-menu-item" onclick="exportList()">Exportera lista</div>
+        <div class="more-menu-item" onclick="shareList()">Dela lista</div>
+        <div class="more-menu-item" onclick="clearCompleted()">Rensa färdiga</div>
+        <div class="more-menu-item" onclick="deleteList()">Ta bort lista</div>
+    </div>
+
+    <!-- Switch List Modal -->
+    <div class="modal" id="switchListModal">
+        <div class="modal-content">
+            <div class="modal-title">Välj lista</div>
+            <div class="modal-list" id="listSwitcher">
+                <!-- Lists will be populated here -->
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-btn cancel" onclick="closeSwitchListModal()">Avbryt</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- New List Modal -->
+    <div class="modal" id="newListModal">
+        <div class="modal-content">
+            <div class="modal-title">Skapa ny lista</div>
+            <input type="text" class="modal-input" id="newListName" placeholder="Namn på lista...">
+            <div class="modal-buttons">
+                <button class="modal-btn cancel" onclick="closeNewListModal()">Avbryt</button>
+                <button class="modal-btn primary" onclick="createNewList()">Skapa</button>
+            </div>
+        </div>
+    </div>
 
     <!-- Main Content -->
     <main class="main-content">
@@ -817,19 +1135,351 @@
         }
         
         function switchList() {
-            alert('Funktionen för att byta lista kommer snart!');
+            showSwitchListModal();
         }
         
         function newList() {
-            const listName = prompt('Namn på ny lista:');
-            if (listName && listName.trim()) {
-                alert(`Ny lista "${listName}" skapad! (Funktionalitet kommer snart)`);
+            showNewListModal();
+        }
+        
+        // Side Menu Functions
+        function toggleSideMenu() {
+            const sideMenu = document.querySelector('.side-menu');
+            const overlay = document.querySelector('.menu-overlay');
+            
+            sideMenu.classList.toggle('open');
+            overlay.classList.toggle('open');
+            
+            if (navigator.vibrate) {
+                navigator.vibrate(50);
+            }
+        }
+        
+        function closeSideMenu() {
+            const sideMenu = document.querySelector('.side-menu');
+            const overlay = document.querySelector('.menu-overlay');
+            
+            sideMenu.classList.remove('open');
+            overlay.classList.remove('open');
+        }
+        
+        // More Menu Functions
+        function toggleMoreMenu() {
+            const moreMenu = document.querySelector('.more-menu');
+            moreMenu.classList.toggle('open');
+            
+            if (navigator.vibrate) {
+                navigator.vibrate(50);
+            }
+            
+            // Close menu when clicking outside
+            setTimeout(() => {
+                document.addEventListener('click', closeMoreMenuOnOutsideClick, { once: true });
+            }, 100);
+        }
+        
+        function closeMoreMenuOnOutsideClick(event) {
+            const moreMenu = document.querySelector('.more-menu');
+            const moreIcon = document.querySelector('.more-icon');
+            
+            if (!moreMenu.contains(event.target) && !moreIcon.contains(event.target)) {
+                moreMenu.classList.remove('open');
+            }
+        }
+        
+        // Switch List Modal Functions
+        function showSwitchListModal() {
+            const modal = document.getElementById('switchListModal');
+            const listSwitcher = document.getElementById('listSwitcher');
+            
+            // Populate list switcher
+            listSwitcher.innerHTML = Object.keys(taskLists).map(listKey => {
+                const tasks = taskLists[listKey];
+                const totalTasks = tasks.length;
+                const completedTasks = tasks.filter(task => task.completed).length;
+                const isActive = listKey === currentList;
+                
+                return `
+                    <div class="modal-list-item ${isActive ? 'active' : ''}" onclick="switchToList('${listKey}')">
+                        <div class="list-info">
+                            <div class="list-name">${getListDisplayName(listKey)}</div>
+                            <div class="list-count">${completedTasks} av ${totalTasks} klara</div>
+                        </div>
+                        ${isActive ? '<div style="color: #1976d2;">✓</div>' : ''}
+                    </div>
+                `;
+            }).join('');
+            
+            modal.classList.add('open');
+        }
+        
+        function closeSwitchListModal() {
+            const modal = document.getElementById('switchListModal');
+            modal.classList.remove('open');
+        }
+        
+        function switchToList(listKey) {
+            currentList = listKey;
+            
+            // Update chip selection
+            document.querySelectorAll('.chip').forEach(chip => {
+                chip.classList.remove('selected');
+                if (chip.textContent === getListDisplayName(listKey)) {
+                    chip.classList.add('selected');
+                }
+            });
+            
+            renderTasks();
+            closeSwitchListModal();
+            
+            if (navigator.vibrate) {
+                navigator.vibrate(50);
+            }
+        }
+        
+        // New List Modal Functions
+        function showNewListModal() {
+            const modal = document.getElementById('newListModal');
+            const input = document.getElementById('newListName');
+            
+            modal.classList.add('open');
+            setTimeout(() => input.focus(), 300);
+        }
+        
+        function closeNewListModal() {
+            const modal = document.getElementById('newListModal');
+            const input = document.getElementById('newListName');
+            
+            modal.classList.remove('open');
+            input.value = '';
+        }
+        
+        function createNewList() {
+            const input = document.getElementById('newListName');
+            const listName = input.value.trim();
+            
+            if (listName) {
+                const listKey = listName.toLowerCase().replace(/\s+/g, '');
+                
+                // Check if list already exists
+                if (taskLists[listKey]) {
+                    alert('En lista med det namnet finns redan!');
+                    return;
+                }
+                
+                // Create new empty list
+                taskLists[listKey] = [];
+                
+                // Add chip to UI
+                const chipsContainer = document.querySelector('.list-chips');
+                const newChip = document.createElement('div');
+                newChip.className = 'chip';
+                newChip.textContent = listName;
+                newChip.onclick = () => selectList(listKey);
+                chipsContainer.appendChild(newChip);
+                
+                // Switch to new list
+                switchToList(listKey);
+                
+                closeNewListModal();
+                
+                if (navigator.vibrate) {
+                    navigator.vibrate([50, 50, 50]);
+                }
+            }
+        }
+        
+        function getListDisplayName(listKey) {
+            const displayNames = {
+                'varmdo': 'Värmdö',
+                'hem': 'Hem',
+                'jobb': 'Jobb'
+            };
+            return displayNames[listKey] || listKey.charAt(0).toUpperCase() + listKey.slice(1);
+        }
+        
+        // Side Menu Item Functions
+        function showAllLists() {
+            closeSideMenu();
+            showSwitchListModal();
+        }
+        
+        function showStatistics() {
+            closeSideMenu();
+            
+            const totalTasks = Object.values(taskLists).reduce((sum, tasks) => sum + tasks.length, 0);
+            const completedTasks = Object.values(taskLists).reduce((sum, tasks) => 
+                sum + tasks.filter(task => task.completed).length, 0);
+            const completionRate = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+            
+            alert(`📊 Statistik:\n\nTotalt antal uppgifter: ${totalTasks}\nFärdiga uppgifter: ${completedTasks}\nGenomförandegrad: ${completionRate}%\n\nAntal listor: ${Object.keys(taskLists).length}`);
+        }
+        
+        function showSettings() {
+            closeSideMenu();
+            alert('⚙️ Inställningar kommer snart!\n\nHär kommer du kunna ändra:\n- Tema (mörkt/ljust)\n- Notifikationer\n- Språk\n- Backup-inställningar');
+        }
+        
+        function showHelp() {
+            closeSideMenu();
+            alert('❓ Hjälp:\n\n• Tryck på + för att lägga till uppgifter\n• Tryck på cirkeln för att markera som klar\n• Håll inne på uppgift för att redigera/ta bort\n• Använd flikarna för att filtrera uppgifter\n• Byt lista med knapparna överst');
+        }
+        
+        function showAbout() {
+            closeSideMenu();
+            alert('ℹ️ Om Todo Lists:\n\nVersion 1.0.0\nEn enkel och elegant todo-app för att hålla koll på dina uppgifter.\n\nSkapad med kärlek för produktivitet! 💙');
+        }
+        
+        // More Menu Functions
+        function sortTasks() {
+            const moreMenu = document.querySelector('.more-menu');
+            moreMenu.classList.remove('open');
+            
+            const tasks = getCurrentTasks();
+            
+            // Sort by priority (high > medium > low) then by completion status
+            tasks.sort((a, b) => {
+                const priorityOrder = { 'high': 3, 'medium': 2, 'low': 1 };
+                
+                if (a.completed !== b.completed) {
+                    return a.completed - b.completed; // Incomplete tasks first
+                }
+                
+                return priorityOrder[b.priority] - priorityOrder[a.priority];
+            });
+            
+            renderTasks();
+            
+            if (navigator.vibrate) {
+                navigator.vibrate(50);
+            }
+        }
+        
+        function exportList() {
+            const moreMenu = document.querySelector('.more-menu');
+            moreMenu.classList.remove('open');
+            
+            const tasks = getCurrentTasks();
+            const listName = getListDisplayName(currentList);
+            
+            let exportText = `${listName} - Todo Lista\n${'='.repeat(listName.length + 13)}\n\n`;
+            
+            tasks.forEach((task, index) => {
+                const status = task.completed ? '✓' : '○';
+                exportText += `${status} ${task.title}\n`;
+                exportText += `   Kategori: ${task.category} | Prioritet: ${task.priority} | ${task.time}\n\n`;
+            });
+            
+            // Create and download file
+            const blob = new Blob([exportText], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${listName.toLowerCase()}_todo.txt`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+        
+        function shareList() {
+            const moreMenu = document.querySelector('.more-menu');
+            moreMenu.classList.remove('open');
+            
+            const tasks = getCurrentTasks();
+            const listName = getListDisplayName(currentList);
+            
+            let shareText = `${listName} - Todo Lista:\n\n`;
+            tasks.forEach(task => {
+                const status = task.completed ? '✅' : '⭕';
+                shareText += `${status} ${task.title}\n`;
+            });
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: `${listName} - Todo Lista`,
+                    text: shareText
+                });
+            } else {
+                // Fallback - copy to clipboard
+                navigator.clipboard.writeText(shareText).then(() => {
+                    alert('Lista kopierad till urklipp!');
+                });
+            }
+        }
+        
+        function clearCompleted() {
+            const moreMenu = document.querySelector('.more-menu');
+            moreMenu.classList.remove('open');
+            
+            const tasks = getCurrentTasks();
+            const completedCount = tasks.filter(task => task.completed).length;
+            
+            if (completedCount === 0) {
+                alert('Inga färdiga uppgifter att rensa!');
+                return;
+            }
+            
+            if (confirm(`Ta bort ${completedCount} färdiga uppgifter?`)) {
+                taskLists[currentList] = tasks.filter(task => !task.completed);
+                renderTasks();
+                
+                if (navigator.vibrate) {
+                    navigator.vibrate(100);
+                }
+            }
+        }
+        
+        function deleteList() {
+            const moreMenu = document.querySelector('.more-menu');
+            moreMenu.classList.remove('open');
+            
+            if (Object.keys(taskLists).length <= 1) {
+                alert('Du måste ha minst en lista!');
+                return;
+            }
+            
+            const listName = getListDisplayName(currentList);
+            if (confirm(`Ta bort hela listan "${listName}"? Detta kan inte ångras!`)) {
+                delete taskLists[currentList];
+                
+                // Remove chip from UI
+                document.querySelectorAll('.chip').forEach(chip => {
+                    if (chip.textContent === listName) {
+                        chip.remove();
+                    }
+                });
+                
+                // Switch to first available list
+                currentList = Object.keys(taskLists)[0];
+                document.querySelector('.chip').classList.add('selected');
+                
+                renderTasks();
+                
+                if (navigator.vibrate) {
+                    navigator.vibrate([100, 50, 100]);
+                }
             }
         }
         
         // Initialize the app
         document.addEventListener('DOMContentLoaded', function() {
             renderTasks();
+            
+            // Close modals when clicking outside
+            document.addEventListener('click', function(event) {
+                const modals = document.querySelectorAll('.modal');
+                modals.forEach(modal => {
+                    if (modal.classList.contains('open') && event.target === modal) {
+                        modal.classList.remove('open');
+                    }
+                });
+            });
+            
+            // Handle Enter key in new list modal
+            document.getElementById('newListName').addEventListener('keypress', function(event) {
+                if (event.key === 'Enter') {
+                    createNewList();
+                }
+            });
         });
         
         // Update time in status bar
