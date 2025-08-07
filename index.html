@@ -626,7 +626,8 @@
             padding: 20px;
         }
         
-        .modal.open {
+        .modal.open,
+        .modal.active {
             opacity: 1;
             visibility: visible;
         }
@@ -641,7 +642,8 @@
             transition: transform 0.3s ease;
         }
         
-        .modal.open .modal-content {
+        .modal.open .modal-content,
+        .modal.active .modal-content {
             transform: scale(1);
         }
         
