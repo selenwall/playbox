@@ -1392,9 +1392,21 @@
                             taskItem.style.transform = 'translateX(-160px)';
                             taskItem.classList.add('swiped-left');
                         } else {
-                            // Swipe right - reveal complete action
-                            taskItem.style.transform = 'translateX(80px)';
-                            taskItem.classList.add('swiped-right');
+                            // Swipe right - automatically mark as completed (if not already completed)
+                            const taskId = parseInt(taskItem.dataset.taskId);
+                            const tasks = getCurrentTasks();
+                            const task = tasks.find(t => t.id === taskId);
+                            
+                            if (task && !task.completed) {
+                                // Auto-complete the task
+                                toggleTask(taskId);
+                                // Reset swipe state immediately after completion
+                                resetSwipeState(taskItem);
+                            } else {
+                                // If already completed, just reveal the undo action
+                                taskItem.style.transform = 'translateX(80px)';
+                                taskItem.classList.add('swiped-right');
+                            }
                         }
                     } else {
                         // Snap back to original position
