@@ -773,7 +773,6 @@
         <div class="app-subtitle">Organisera dina projekt och resor</div>
         
         <div class="list-chips">
-            <div class="chip selected" onclick="selectList('varmdo')">Värmdö</div>
         </div>
         
         <div class="action-buttons">
@@ -885,7 +884,7 @@
         // Task lists for each category
         let taskLists = {};
         
-        let currentList = 'varmdo';
+        let currentList = null;
         let currentTab = 'all';
         
         // Get current tasks based on selected list
@@ -895,6 +894,19 @@
         
         function renderTasks() {
             const tasksList = document.getElementById('tasksList');
+            
+            // Check if no lists exist
+            if (Object.keys(taskLists).length === 0 || !currentList) {
+                tasksList.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">📝</div>
+                        <div class="empty-title">Inga listor</div>
+                        <div class="empty-subtitle">Skapa din första lista genom att trycka på "NY LISTA".</div>
+                    </div>
+                `;
+                return;
+            }
+            
             const tasks = getCurrentTasks();
             let filteredTasks = tasks;
             
@@ -1043,6 +1055,12 @@
         function addTask() {
             const input = document.getElementById('taskInput');
             const rawInput = input.value.trim();
+            
+            // Check if there's a current list selected
+            if (!currentList || !taskLists[currentList]) {
+                alert('Skapa eller välj en lista först.');
+                return;
+            }
             
             if (rawInput) {
                 const { title, dueDate } = parseTaskInput(rawInput);
@@ -1314,9 +1332,7 @@
         }
         
         function getListDisplayName(listKey) {
-            const displayNames = {
-                'varmdo': 'Värmdö'
-            };
+            const displayNames = {};
             return displayNames[listKey] || listKey.charAt(0).toUpperCase() + listKey.slice(1);
         }
         
@@ -1518,6 +1534,9 @@
                             chip.classList.add('selected');
                         }
                     });
+                } else if (Object.keys(taskLists).length > 0) {
+                    // If no saved current list but there are lists, select the first one
+                    currentList = Object.keys(taskLists)[0];
                 }
                 
                 return savedTaskLists !== null;
@@ -1529,25 +1548,28 @@
         
         function restoreListChips() {
             const chipsContainer = document.querySelector('.list-chips');
-            const defaultLists = ['varmdo'];
             
-            // Add chips for any custom lists that aren't in the default set
+            // Add chips for all lists from taskLists
             Object.keys(taskLists).forEach(listKey => {
-                if (!defaultLists.includes(listKey)) {
-                    const listName = getListDisplayName(listKey);
+                const listName = getListDisplayName(listKey);
+                
+                // Check if chip already exists
+                const existingChip = Array.from(chipsContainer.children).find(chip => 
+                    chip.textContent === listName
+                );
+                
+                if (!existingChip) {
+                    const newChip = document.createElement('div');
+                    newChip.className = 'chip';
+                    newChip.textContent = listName;
+                    newChip.onclick = () => selectList(listKey);
                     
-                    // Check if chip already exists
-                    const existingChip = Array.from(chipsContainer.children).find(chip => 
-                        chip.textContent === listName
-                    );
-                    
-                    if (!existingChip) {
-                        const newChip = document.createElement('div');
-                        newChip.className = 'chip';
-                        newChip.textContent = listName;
-                        newChip.onclick = () => selectList(listKey);
-                        chipsContainer.appendChild(newChip);
+                    // Mark as selected if it's the current list
+                    if (listKey === currentList) {
+                        newChip.classList.add('selected');
                     }
+                    
+                    chipsContainer.appendChild(newChip);
                 }
             });
         }
@@ -1557,33 +1579,10 @@
             // Try to load from localStorage first
             const hasData = loadFromLocalStorage();
             
-            // If no saved data, initialize with default task lists
+            // If no saved data, start with empty task lists
             if (!hasData) {
-                taskLists = {
-                varmdo: [
-                    {
-                        id: 1,
-                        title: "Middag William",
-                        completed: false,
-                        priority: "high",
-                        time: null
-                    },
-                    {
-                        id: 2,
-                        title: "Frukost barnen",
-                        completed: false,
-                        priority: "medium",
-                        time: formatDate(new Date())
-                    },
-                    {
-                        id: 3,
-                        title: "Packa väskan",
-                        completed: true,
-                        priority: "medium",
-                        time: formatDate(new Date(Date.now() - 86400000)) // Yesterday
-                    }
-                ]
-            };
+                taskLists = {};
+                currentList = null;
             }
             
             renderTasks();
