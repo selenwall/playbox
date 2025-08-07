@@ -774,8 +774,6 @@
         
         <div class="list-chips">
             <div class="chip selected" onclick="selectList('varmdo')">Värmdö</div>
-            <div class="chip" onclick="selectList('hem')">Hem</div>
-            <div class="chip" onclick="selectList('jobb')">Jobb</div>
         </div>
         
         <div class="action-buttons">
@@ -1317,9 +1315,7 @@
         
         function getListDisplayName(listKey) {
             const displayNames = {
-                'varmdo': 'Värmdö',
-                'hem': 'Hem',
-                'jobb': 'Jobb'
+                'varmdo': 'Värmdö'
             };
             return displayNames[listKey] || listKey.charAt(0).toUpperCase() + listKey.slice(1);
         }
@@ -1533,7 +1529,7 @@
         
         function restoreListChips() {
             const chipsContainer = document.querySelector('.list-chips');
-            const defaultLists = ['varmdo', 'hem', 'jobb'];
+            const defaultLists = ['varmdo'];
             
             // Add chips for any custom lists that aren't in the default set
             Object.keys(taskLists).forEach(listKey => {
@@ -1584,52 +1580,6 @@
                         title: "Packa väskan",
                         completed: true,
                         priority: "medium",
-                        time: formatDate(new Date(Date.now() - 86400000)) // Yesterday
-                    }
-                ],
-                hem: [
-                    {
-                        id: 4,
-                        title: "Städa vardagsrummet",
-                        completed: false,
-                        priority: "medium",
-                        time: null
-                    },
-                    {
-                        id: 5,
-                        title: "Handla mat",
-                        completed: false,
-                        priority: "high",
-                        time: formatDate(new Date())
-                    },
-                    {
-                        id: 6,
-                        title: "Betala räkningar",
-                        completed: true,
-                        priority: "high",
-                        time: formatDate(new Date(Date.now() - 86400000)) // Yesterday
-                    }
-                ],
-                jobb: [
-                    {
-                        id: 7,
-                        title: "Slutför projektet",
-                        completed: false,
-                        priority: "high",
-                        time: null
-                    },
-                    {
-                        id: 8,
-                        title: "Skicka rapport",
-                        completed: false,
-                        priority: "medium",
-                        time: formatDate(new Date(Date.now() + 86400000)) // Tomorrow
-                    },
-                    {
-                        id: 9,
-                        title: "Möte med klienten",
-                        completed: true,
-                        priority: "high",
                         time: formatDate(new Date(Date.now() - 86400000)) // Yesterday
                     }
                 ]
