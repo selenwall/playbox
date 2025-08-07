@@ -749,6 +749,176 @@
         .modal-input:focus {
             border-color: #1976d2;
         }
+
+        /* Settings Modal Styles */
+        .settings-section {
+            margin-bottom: 24px;
+        }
+
+        .settings-label {
+            font-size: 16px;
+            font-weight: 500;
+            color: #212121;
+            margin-bottom: 12px;
+        }
+
+        .settings-options {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .setting-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+
+        .setting-option:hover {
+            background: #f8f8f8;
+        }
+
+        .setting-option input[type="radio"],
+        .setting-option input[type="checkbox"] {
+            margin: 0;
+        }
+
+        .settings-btn {
+            padding: 8px 16px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            background: white;
+            color: #212121;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: left;
+        }
+
+        .settings-btn:hover {
+            background: #f8f8f8;
+            border-color: #d0d0d0;
+        }
+
+        .settings-btn.danger {
+            color: #d32f2f;
+            border-color: #ffcdd2;
+        }
+
+        .settings-btn.danger:hover {
+            background: #ffebee;
+            border-color: #ef9a9a;
+        }
+
+        /* Dark Theme Styles */
+        .dark-theme {
+            background: #121212;
+            color: #ffffff;
+        }
+
+        .dark-theme .header {
+            background: #1e1e1e;
+            color: #ffffff;
+        }
+
+        .dark-theme .app-title {
+            color: #ffffff;
+        }
+
+        .dark-theme .app-subtitle {
+            color: #b0b0b0;
+        }
+
+        .dark-theme .chip {
+            background: #2c2c2c;
+            color: #ffffff;
+            border-color: #404040;
+        }
+
+        .dark-theme .chip.selected {
+            background: #1976d2;
+        }
+
+        .dark-theme .action-btn {
+            background: #2c2c2c;
+            color: #ffffff;
+            border-color: #404040;
+        }
+
+        .dark-theme .main-content {
+            background: #121212;
+        }
+
+        .dark-theme .progress-card {
+            background: #1e1e1e;
+            border-color: #404040;
+        }
+
+        .dark-theme .progress-title {
+            color: #ffffff;
+        }
+
+        .dark-theme .progress-subtitle {
+            color: #b0b0b0;
+        }
+
+        .dark-theme .task-item {
+            background: #1e1e1e;
+            border-color: #404040;
+        }
+
+        .dark-theme .task-title {
+            color: #ffffff;
+        }
+
+        .dark-theme .task-time {
+            color: #b0b0b0;
+        }
+
+        .dark-theme .empty-title {
+            color: #ffffff;
+        }
+
+        .dark-theme .empty-subtitle {
+            color: #b0b0b0;
+        }
+
+        .dark-theme .modal-content {
+            background: #1e1e1e;
+            color: #ffffff;
+        }
+
+        .dark-theme .modal-title {
+            color: #ffffff;
+        }
+
+        .dark-theme .modal-input {
+            background: #2c2c2c;
+            border-color: #404040;
+            color: #ffffff;
+        }
+
+        .dark-theme .settings-label {
+            color: #ffffff;
+        }
+
+        .dark-theme .setting-option:hover {
+            background: #2c2c2c;
+        }
+
+        .dark-theme .settings-btn {
+            background: #2c2c2c;
+            border-color: #404040;
+            color: #ffffff;
+        }
+
+        .dark-theme .settings-btn:hover {
+            background: #404040;
+        }
     </style>
 </head>
 <body>
@@ -836,6 +1006,54 @@
             <div class="modal-buttons">
                 <button class="modal-btn cancel" onclick="closeNewListModal()">Avbryt</button>
                 <button class="modal-btn primary" onclick="createNewList()">Skapa</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal" id="settingsModal">
+        <div class="modal-content">
+            <div class="modal-title">⚙️ Inställningar</div>
+            
+            <div class="settings-section">
+                <div class="settings-label">Tema</div>
+                <div class="settings-options">
+                    <label class="setting-option">
+                        <input type="radio" name="theme" value="light" checked>
+                        <span>☀️ Ljust</span>
+                    </label>
+                    <label class="setting-option">
+                        <input type="radio" name="theme" value="dark">
+                        <span>🌙 Mörkt</span>
+                    </label>
+                    <label class="setting-option">
+                        <input type="radio" name="theme" value="auto">
+                        <span>🔄 Automatisk</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <div class="settings-label">Notifikationer</div>
+                <div class="settings-options">
+                    <label class="setting-option">
+                        <input type="checkbox" id="enableNotifications">
+                        <span>🔔 Aktivera notifikationer</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <div class="settings-label">Data</div>
+                <div class="settings-options">
+                    <button class="settings-btn" onclick="exportData()">📤 Exportera data</button>
+                    <button class="settings-btn" onclick="importData()">📥 Importera data</button>
+                    <button class="settings-btn danger" onclick="clearAllData()">🗑️ Rensa all data</button>
+                </div>
+            </div>
+
+            <div class="modal-buttons">
+                <button class="modal-btn cancel" onclick="closeSettingsModal()">Stäng</button>
             </div>
         </div>
     </div>
@@ -1351,7 +1569,11 @@
         
         function showSettings() {
             closeSideMenu();
-            alert('⚙️ Inställningar kommer snart!\n\nHär kommer du kunna ändra:\n- Tema (mörkt/ljust)\n- Notifikationer\n- Språk\n- Backup-inställningar');
+            const modal = document.getElementById('settingsModal');
+            modal.classList.add('open');
+            
+            // Load current settings
+            loadSettings();
         }
         
         function showHelp() {
@@ -1363,7 +1585,164 @@
             closeSideMenu();
             alert('ℹ️ Om Todo Lists:\n\nVersion 1.0.0\nEn enkel och elegant todo-app för att hålla koll på dina uppgifter.\n\nSkapad med kärlek för produktivitet! 💙');
         }
-        
+
+        // Settings Functions
+        function closeSettingsModal() {
+            const modal = document.getElementById('settingsModal');
+            modal.classList.remove('open');
+        }
+
+        function loadSettings() {
+            try {
+                // Load theme setting
+                const savedTheme = localStorage.getItem('theme') || 'light';
+                document.querySelector(`input[name="theme"][value="${savedTheme}"]`).checked = true;
+                
+                // Load notifications setting
+                const notificationsEnabled = localStorage.getItem('notificationsEnabled') === 'true';
+                document.getElementById('enableNotifications').checked = notificationsEnabled;
+                
+                // Apply current theme
+                applyTheme(savedTheme);
+            } catch (error) {
+                console.error('Failed to load settings:', error);
+            }
+        }
+
+        function applyTheme(theme) {
+            const body = document.body;
+            
+            // Remove existing theme classes
+            body.classList.remove('light-theme', 'dark-theme');
+            
+            if (theme === 'dark') {
+                body.classList.add('dark-theme');
+            } else if (theme === 'auto') {
+                // Check system preference
+                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                if (prefersDark) {
+                    body.classList.add('dark-theme');
+                } else {
+                    body.classList.add('light-theme');
+                }
+            } else {
+                body.classList.add('light-theme');
+            }
+        }
+
+        function exportData() {
+            try {
+                const data = {
+                    taskLists: taskLists,
+                    currentList: currentList,
+                    settings: {
+                        theme: localStorage.getItem('theme') || 'light',
+                        notificationsEnabled: localStorage.getItem('notificationsEnabled') === 'true'
+                    },
+                    exportDate: new Date().toISOString()
+                };
+                
+                const dataStr = JSON.stringify(data, null, 2);
+                const dataBlob = new Blob([dataStr], {type: 'application/json'});
+                
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(dataBlob);
+                link.download = `todo-lists-backup-${new Date().toISOString().split('T')[0]}.json`;
+                link.click();
+                
+                alert('📤 Data exporterad! Filen har laddats ner.');
+            } catch (error) {
+                console.error('Export failed:', error);
+                alert('❌ Kunde inte exportera data.');
+            }
+        }
+
+        function importData() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            
+            input.onchange = function(event) {
+                const file = event.target.files[0];
+                if (!file) return;
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const data = JSON.parse(e.target.result);
+                        
+                        if (data.taskLists) {
+                            taskLists = data.taskLists;
+                            currentList = data.currentList || null;
+                            
+                            // Apply imported settings
+                            if (data.settings) {
+                                localStorage.setItem('theme', data.settings.theme || 'light');
+                                localStorage.setItem('notificationsEnabled', data.settings.notificationsEnabled || 'false');
+                            }
+                            
+                            saveToLocalStorage();
+                            loadFromLocalStorage();
+                            renderTasks();
+                            
+                            alert('📥 Data importerad framgångsrikt!');
+                            closeSettingsModal();
+                        } else {
+                            alert('❌ Ogiltig datafil.');
+                        }
+                    } catch (error) {
+                        console.error('Import failed:', error);
+                        alert('❌ Kunde inte importera data. Kontrollera att filen är giltig.');
+                    }
+                };
+                reader.readAsText(file);
+            };
+            
+            input.click();
+        }
+
+        function clearAllData() {
+            if (confirm('🗑️ Är du säker på att du vill rensa all data?\n\nDetta kommer att ta bort alla dina listor och uppgifter permanent.')) {
+                localStorage.clear();
+                taskLists = {};
+                currentList = null;
+                
+                // Clear the chips container
+                const chipsContainer = document.querySelector('.list-chips');
+                const plusButton = chipsContainer.querySelector('button');
+                chipsContainer.innerHTML = '';
+                chipsContainer.appendChild(plusButton);
+                
+                renderTasks();
+                alert('🗑️ All data har rensats.');
+                                closeSettingsModal();
+            }
+        }
+
+        function initializeSettingsListeners() {
+            // Theme change listeners
+            document.querySelectorAll('input[name="theme"]').forEach(radio => {
+                radio.addEventListener('change', function() {
+                    if (this.checked) {
+                        localStorage.setItem('theme', this.value);
+                        applyTheme(this.value);
+                    }
+                });
+            });
+
+            // Notifications listener
+            document.getElementById('enableNotifications').addEventListener('change', function() {
+                localStorage.setItem('notificationsEnabled', this.checked);
+                
+                if (this.checked) {
+                    // Request notification permission
+                    if ('Notification' in window && Notification.permission === 'default') {
+                        Notification.requestPermission();
+                    }
+                }
+            });
+        }
+
         // More Menu Functions
         function sortTasks() {
             const moreMenu = document.querySelector('.more-menu');
@@ -1582,6 +1961,9 @@
             }
             
             renderTasks();
+            
+            // Initialize settings event listeners
+            initializeSettingsListeners();
             
             // Close modals when clicking outside
             document.addEventListener('click', function(event) {
