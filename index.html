@@ -1131,8 +1131,13 @@
             // Remove selected class from all chips
             document.querySelectorAll('.chip').forEach(chip => chip.classList.remove('selected'));
             
-            // Add selected class to clicked chip
-            event.target.classList.add('selected');
+            // Add selected class to clicked chip - find the chip with matching list name
+            const targetChip = Array.from(document.querySelectorAll('.chip')).find(chip => 
+                chip.textContent === getListDisplayName(listName)
+            );
+            if (targetChip) {
+                targetChip.classList.add('selected');
+            }
             
             // Update current list
             currentList = listName;
