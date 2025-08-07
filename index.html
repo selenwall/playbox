@@ -20,18 +20,6 @@
             touch-action: manipulation;
         }
         
-        /* Status bar simulation */
-        .status-bar {
-            height: 24px;
-            background: #1976d2;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 16px;
-            color: white;
-            font-size: 12px;
-            font-weight: 500;
-        }
         
         /* App Bar */
         .app-bar {
@@ -922,12 +910,6 @@
     </style>
 </head>
 <body>
-    <!-- Status bar simulation -->
-    <div class="status-bar">
-        <div>08:01</div>
-        <div>🔋 23% 📶 5G</div>
-    </div>
-
     <!-- App Bar -->
     <header class="app-bar">
         <div class="app-bar-top">
@@ -1983,19 +1965,7 @@
             });
         });
         
-        // Update time in status bar
-        function updateTime() {
-            const now = new Date();
-            const timeString = now.toLocaleTimeString('sv-SE', { 
-                hour: '2-digit', 
-                minute: '2-digit' 
-            });
-            document.querySelector('.status-bar div:first-child').textContent = timeString;
-        }
-        
-        // Update time every minute
-        updateTime();
-        setInterval(updateTime, 60000);
+
     </script>
 </body>
 </html>
