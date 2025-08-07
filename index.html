@@ -314,6 +314,8 @@
             color: #757575;
             font-size: 12px;
         }
+        .task-time.overdue { color: #d32f2f; font-weight: 600; }
+        .task-time.today { color: #f57c00; font-weight: 600; }
         
         .priority-indicator {
             width: 4px;
@@ -1045,6 +1047,117 @@
         .dark-theme .settings-btn:hover {
             background: #404040;
         }
+
+        /* Toolbar (search/sort/hide) */
+        .filters-toolbar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 16px;
+            background: white;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .filters-toolbar input[type="search"] {
+            flex: 1;
+            min-width: 0;
+            padding: 10px 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 20px;
+            font-size: 14px;
+            background: #fafafa;
+        }
+        .filters-toolbar select {
+            padding: 8px 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            background: #fafafa;
+            font-size: 14px;
+        }
+        .filters-toolbar .hide-completed {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: #424242;
+            font-size: 13px;
+            white-space: nowrap;
+        }
+
+        /* Input hint */
+        .input-hint {
+            margin-top: 8px;
+            font-size: 12px;
+            color: #757575;
+        }
+
+        /* Hover actions for tasks */
+        .task-item:hover .task-actions {
+            opacity: 1;
+        }
+
+        /* Icon button normalization */
+        .icon-button {
+            background: none;
+            border: none;
+            color: inherit;
+            padding: 8px;
+            margin: -8px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+        .icon-button:active { background: rgba(255,255,255,0.12); }
+        .icon-button:focus { outline: 2px solid rgba(255,255,255,0.8); outline-offset: 2px; }
+
+        /* Snackbar / Toast */
+        .snackbar {
+            position: fixed;
+            left: 50%;
+            bottom: 16px;
+            transform: translateX(-50%);
+            background: #323232;
+            color: #fff;
+            padding: 12px 16px;
+            border-radius: 4px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            display: none;
+            gap: 16px;
+            align-items: center;
+            z-index: 1000;
+        }
+        .snackbar.show { display: inline-flex; }
+        .snackbar .action {
+            color: #90caf9;
+            cursor: pointer;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 12px;
+        }
+
+        /* Hint bar */
+        .hint-bar {
+            padding: 8px 16px;
+            background: #e3f2fd;
+            color: #0d47a1;
+            font-size: 13px;
+            display: none;
+        }
+        .hint-bar.show { display: block; }
+        .hint-bar .close-hint {
+            float: right;
+            background: none;
+            border: none;
+            color: #0d47a1;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        /* Modal base a11y improvements */
+        .modal[aria-hidden="true"] { display: none; }
+        .modal[aria-hidden="false"] { display: flex; }
+
     </style>
 </head>
 <body>
@@ -1052,18 +1165,18 @@
     <header class="app-bar">
         <div class="app-bar-top">
             <div class="app-bar-title">
-                <div class="menu-icon" onclick="toggleSideMenu()">☰</div>
+                <button class="icon-button menu-icon" onclick="toggleSideMenu()" aria-label="Öppna meny">☰</button>
                 <div>
                     <div class="app-title">Todo Lists</div>
                 </div>
             </div>
-            <div class="more-icon" onclick="toggleMoreMenu()">⋮</div>
+            <button class="icon-button more-icon" onclick="toggleMoreMenu()" aria-label="Fler åtgärder">⋮</button>
         </div>
         
         <div class="app-subtitle">Organisera dina projekt och resor</div>
         
-        <div class="list-chips">
-            <button class="action-btn ripple" onclick="newList()" style="font-size: 16px; margin-right: 10px;">+</button>
+        <div class="list-chips" role="tablist" aria-label="Listor">
+            <button class="action-btn ripple" onclick="newList()" style="font-size: 16px; margin-right: 10px;" aria-label="Ny lista">+ Ny lista</button>
         </div>
     </header>
 
@@ -1102,6 +1215,8 @@
         <div class="more-menu-item" onclick="exportList()">Exportera lista</div>
         <div class="more-menu-item" onclick="shareList()">Dela lista</div>
         <div class="more-menu-item" onclick="clearCompleted()">Rensa färdiga</div>
+        <div class="more-menu-item" onclick="renameList()">Byt namn på lista</div>
+        <div class="more-menu-item" onclick="deleteList()">Ta bort lista</div>
     </div>
 
     <!-- Switch List Modal -->
@@ -1190,17 +1305,53 @@
         </div>
     </div>
 
-    <!-- Rename List Modal -->
-    <div class="modal" id="renameListModal">
-        <div class="modal-content">
-            <div class="modal-title">Byt namn på lista</div>
-            <input type="text" class="modal-input" id="renameListName" placeholder="Nytt namn på lista...">
-            <div class="modal-buttons">
-                <button class="modal-btn cancel" onclick="closeRenameListModal()">Avbryt</button>
-                <button class="modal-btn primary" onclick="confirmRenameList()">Byt namn</button>
+            <!-- Rename List Modal -->
+        <div class="modal" id="renameListModal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="renameListTitle">
+            <div class="modal-content">
+                <div class="modal-title" id="renameListTitle">Byt namn på lista</div>
+                <input type="text" class="modal-input" id="renameListName" placeholder="Nytt namn på lista...">
+                <div class="modal-buttons">
+                    <button class="modal-btn cancel" onclick="closeRenameListModal()">Avbryt</button>
+                    <button class="modal-btn primary" onclick="confirmRenameList()">Byt namn</button>
+                </div>
             </div>
         </div>
-    </div>
+
+        <!-- Edit Task Modal -->
+        <div class="modal" id="editTaskModal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="editTaskTitle">
+            <div class="modal-content">
+                <div class="modal-title" id="editTaskTitle">Redigera uppgift</div>
+                <input type="text" class="modal-input" id="editTaskTitleInput" placeholder="Titel">
+                <div class="settings-section">
+                    <div class="settings-label">Prioritet</div>
+                    <div class="settings-options">
+                        <label class="setting-option"><input type="radio" name="editPriority" value="high"> Hög</label>
+                        <label class="setting-option"><input type="radio" name="editPriority" value="medium" checked> Medel</label>
+                        <label class="setting-option"><input type="radio" name="editPriority" value="low"> Låg</label>
+                    </div>
+                </div>
+                <div class="settings-section">
+                    <div class="settings-label">Förfallodatum</div>
+                    <input type="date" class="modal-input" id="editTaskDueInput">
+                    <div class="settings-options">
+                        <button class="settings-btn" onclick="quickDue('today')">Idag</button>
+                        <button class="settings-btn" onclick="quickDue('tomorrow')">Imorgon</button>
+                        <button class="settings-btn" onclick="quickDue('weekend')">Helgen</button>
+                        <button class="settings-btn" onclick="quickDue('clear')">Rensa</button>
+                    </div>
+                </div>
+                <div class="modal-buttons">
+                    <button class="modal-btn cancel" onclick="closeEditTaskModal()">Avbryt</button>
+                    <button class="modal-btn primary" onclick="saveEditTask()">Spara</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Snackbar -->
+        <div class="snackbar" id="snackbar" role="status" aria-live="polite">
+            <span id="snackbarText"></span>
+            <button class="action" id="snackbarAction" onclick="snackbarAction()"></button>
+        </div>
 
     <!-- Main Content -->
     <main class="main-content">
@@ -1210,26 +1361,43 @@
                 <div class="progress-text" id="progressText">0 av 0 uppgifter klara</div>
                 <div class="items-left" id="itemsLeft">0 kvar</div>
             </div>
-            <div class="progress-bar">
+            <div class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-labelledby="progressText">
                 <div class="progress-fill" id="progressFill"></div>
             </div>
         </div>
         
         <!-- Tabs -->
         <div class="tabs-container">
-            <div class="tabs">
-                <button class="tab active" onclick="showTab('all')">Alla</button>
-                <button class="tab" onclick="showTab('active')">Aktiva</button>
-                <button class="tab" onclick="showTab('completed')">Klara</button>
+            <div class="tabs" role="tablist" aria-label="Filterflikar">
+                <button class="tab active" onclick="showTab('all')" role="tab" aria-selected="true">Alla</button>
+                <button class="tab" onclick="showTab('active')" role="tab" aria-selected="false">Aktiva</button>
+                <button class="tab" onclick="showTab('completed')" role="tab" aria-selected="false">Klara</button>
             </div>
         </div>
+        <div class="hint-bar" id="swipeHint">
+            Tips: Svep en uppgift åt vänster för att redigera/ta bort — åt höger för att markera klar.
+            <button class="close-hint" onclick="dismissSwipeHint()" aria-label="Stäng tips">×</button>
+        </div>
         
+        <!-- Filters toolbar -->
+        <div class="filters-toolbar">
+            <input type="search" id="taskSearch" placeholder="Sök uppgifter..." aria-label="Sök uppgifter" oninput="applyFilters()">
+            <select id="taskSort" aria-label="Sortering" onchange="applyFilters()">
+                <option value="default">Standard</option>
+                <option value="priority">Prioritet</option>
+                <option value="due">Förfallodatum</option>
+                <option value="alpha">Alfabetisk</option>
+            </select>
+            <label class="hide-completed"><input type="checkbox" id="hideCompletedToggle" onchange="applyFilters()"> Dölj klara</label>
+        </div>
+
         <!-- Task Input -->
         <div class="task-input-container">
             <div class="task-input-wrapper">
-                <input type="text" class="task-input" id="taskInput" placeholder="Lägg till uppgift..." onkeypress="handleKeyPress(event)">
-                <button class="add-button" onclick="addTask()">+</button>
+                <input type="text" class="task-input" id="taskInput" placeholder="Lägg till uppgift..." onkeypress="handleKeyPress(event)" aria-label="Lägg till uppgift">
+                <button class="add-button" onclick="addTask()" aria-label="Lägg till uppgift">+</button>
             </div>
+            <div class="input-hint">Tips: använd @idag, @imorgon, @20250101 eller veckodag (t.ex. @måndag)</div>
         </div>
         
         <!-- Tasks List -->
@@ -1252,14 +1420,17 @@
         
         function renderTasks() {
             const tasksList = document.getElementById('tasksList');
+            const search = (document.getElementById('taskSearch')?.value || '').toLowerCase();
+            const sort = document.getElementById('taskSort')?.value || 'default';
+            const hideCompleted = document.getElementById('hideCompletedToggle')?.checked || false;
             
-            // Check if no lists exist
             if (Object.keys(taskLists).length === 0 || !currentList) {
                 tasksList.innerHTML = `
                     <div class="empty-state">
                         <div class="empty-icon">📝</div>
                         <div class="empty-title">Inga listor</div>
-                        <div class="empty-subtitle">Skapa din första lista genom att trycka på "NY LISTA".</div>
+                        <div class="empty-subtitle">Skapa din första lista genom att trycka på "Ny lista".</div>
+                        <div style="margin-top:16px;"><button class="action-btn" onclick="newList()">+ Skapa lista</button></div>
                     </div>
                 `;
                 return;
@@ -1269,9 +1440,24 @@
             let filteredTasks = tasks;
             
             if (currentTab === 'active') {
-                filteredTasks = tasks.filter(task => !task.completed);
+                filteredTasks = filteredTasks.filter(task => !task.completed);
             } else if (currentTab === 'completed') {
-                filteredTasks = tasks.filter(task => task.completed);
+                filteredTasks = filteredTasks.filter(task => task.completed);
+            }
+            if (hideCompleted && currentTab === 'all') {
+                filteredTasks = filteredTasks.filter(t => !t.completed);
+            }
+            if (search) {
+                filteredTasks = filteredTasks.filter(t => t.title.toLowerCase().includes(search));
+            }
+            if (sort === 'priority') {
+                const order = { high: 3, medium: 2, low: 1 };
+                filteredTasks = [...filteredTasks].sort((a,b) => order[b.priority]-order[a.priority]);
+            } else if (sort === 'due') {
+                const toTime = t => (t.dueTs ?? (t.time ? Date.parse(t.time) : null) ?? Infinity);
+                filteredTasks = [...filteredTasks].sort((a,b) => toTime(a)-toTime(b));
+            } else if (sort === 'alpha') {
+                filteredTasks = [...filteredTasks].sort((a,b) => a.title.localeCompare(b.title));
             }
             
             if (filteredTasks.length === 0) {
@@ -1286,11 +1472,11 @@
                 tasksList.innerHTML = filteredTasks.map(task => `
                     <div class="task-item-wrapper" data-task-id="${task.id}">
                         <div class="swipe-actions swipe-left-actions">
-                            <button class="swipe-action-btn edit-btn" onclick="editTask(${task.id})">
+                            <button class="swipe-action-btn edit-btn" onclick="openEditTaskModal(${task.id})">
                                 <span class="swipe-icon">✏️</span>
                                 <span class="swipe-label">Redigera</span>
                             </button>
-                            <button class="swipe-action-btn delete-btn" onclick="deleteTask(${task.id})">
+                            <button class="swipe-action-btn delete-btn" onclick="requestDeleteTask(${task.id})">
                                 <span class="swipe-icon">🗑️</span>
                                 <span class="swipe-label">Ta bort</span>
                             </button>
@@ -1302,17 +1488,17 @@
                             </button>
                         </div>
                         <div class="task-item" data-task-id="${task.id}">
-                            <div class="priority-indicator priority-${task.priority}"></div>
+                            <div class="priority-indicator priority-${task.priority}" onclick="event.stopPropagation(); cyclePriority(${task.id})" title="Ändra prioritet" aria-label="Ändra prioritet"></div>
                             <div class="task-checkbox ${task.completed ? 'checked' : ''}"></div>
                             <div class="task-content">
                                 <div class="task-title ${task.completed ? 'completed' : ''}">${task.title}</div>
                                 <div class="task-meta">
-                                    ${task.time ? `<div class="task-time">${task.time}</div>` : ''}
+                                    ${task.time ? `<div class=\"task-time\" data-duets=\"${task.dueTs ?? ''}\">${task.time}</div>` : ''}
                                 </div>
                             </div>
                             <div class="task-actions">
-                                <button class="task-action-btn" onclick="event.stopPropagation(); editTask(${task.id})">✏️</button>
-                                <button class="task-action-btn delete" onclick="event.stopPropagation(); deleteTask(${task.id})">🗑️</button>
+                                <button class="task-action-btn" onclick="event.stopPropagation(); openEditTaskModal(${task.id})" aria-label="Redigera">✏️</button>
+                                <button class="task-action-btn delete" onclick="event.stopPropagation(); requestDeleteTask(${task.id})" aria-label="Ta bort">🗑️</button>
                             </div>
                         </div>
                     </div>
@@ -1320,9 +1506,23 @@
             }
             
             updateProgress();
-            
-            // Initialize swipe handlers for new task items
             initializeSwipeHandlers();
+            decorateDueLabels();
+        }
+
+        function decorateDueLabels() {
+            const els = document.querySelectorAll('.task-time');
+            const startOfDay = (d) => { const x = new Date(d); x.setHours(0,0,0,0); return x; };
+            const today = startOfDay(new Date()).getTime();
+            els.forEach(el => {
+                el.classList.remove('overdue', 'today');
+                const ts = parseInt(el.getAttribute('data-duets') || '');
+                if (!isNaN(ts)) {
+                    const day = startOfDay(new Date(ts)).getTime();
+                    if (day < today) el.classList.add('overdue');
+                    else if (day === today) el.classList.add('today');
+                }
+            });
         }
         
         // Swipe functionality
@@ -1482,29 +1682,21 @@
             const percentage = total > 0 ? (completed / total) * 100 : 0;
             
             document.getElementById('progressFill').style.width = `${percentage}%`;
-            document.getElementById('progressText').textContent = `${completed} av ${total} uppgifter klara`;
+            document.getElementById('progressText').textContent = `${completed} av ${total} uppgifter klara (${Math.round(percentage)}%)`;
             document.getElementById('itemsLeft').textContent = `${remaining} kvar`;
+            const bar = document.querySelector('.progress-bar');
+            if (bar) bar.setAttribute('aria-valuenow', String(Math.round(percentage)));
         }
         
         function parseTaskInput(input) {
-            // Look for @ symbol followed by date
             const atIndex = input.lastIndexOf('@');
-            
-            if (atIndex === -1) {
-                // No @ symbol found, return original title with no due date
-                return { title: input, dueDate: null };
-            }
-            
+            if (atIndex === -1) { return { title: input, dueDate: null, dueISO: null }; }
             const title = input.substring(0, atIndex).trim();
             const dateStr = input.substring(atIndex + 1).trim();
-            
-            if (!dateStr) {
-                // @ symbol found but no date, return title without @
-                return { title: title, dueDate: null };
-            }
-            
-            const parsedDate = parseDateExpression(dateStr);
-            return { title: title, dueDate: parsedDate };
+            if (!dateStr) { return { title: title, dueDate: null, dueISO: null }; }
+            const dueISO = parseDateExpressionISO(dateStr);
+            const dueDate = dueISO ? new Date(dueISO).toLocaleDateString('sv-SE', { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' }) : parseDateExpression(dateStr);
+            return { title: title, dueDate, dueISO };
         }
         
         function parseDateExpression(dateStr) {
@@ -1556,6 +1748,34 @@
             return dateStr;
         }
         
+        // ISO helper for due date (yyyy-mm-dd)
+        function parseDateExpressionISO(dateStr) {
+            const lower = dateStr.toLowerCase();
+            const today = new Date();
+            const toISO = (d) => {
+                const y = d.getFullYear();
+                const m = String(d.getMonth() + 1).padStart(2, '0');
+                const da = String(d.getDate()).padStart(2, '0');
+                return `${y}-${m}-${da}`;
+            };
+            if (lower === 'today' || lower === 'idag') return toISO(today);
+            if (lower === 'tomorrow' || lower === 'imorgon') {
+                const t = new Date(today); t.setDate(today.getDate() + 1); return toISO(t);
+            }
+            if (/^\d{8}$/.test(dateStr)) {
+                const y = parseInt(dateStr.substring(0, 4));
+                const m = parseInt(dateStr.substring(4, 6));
+                const d = parseInt(dateStr.substring(6, 8));
+                return `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+            }
+            const map = { 'monday':1,'måndag':1,'tuesday':2,'tisdag':2,'wednesday':3,'onsdag':3,'thursday':4,'torsdag':4,'friday':5,'fredag':5,'saturday':6,'lördag':6,'sunday':0,'söndag':0 };
+            if (map[lower] !== undefined) {
+                const next = getNextWeekday(today, map[lower]);
+                return toISO(next);
+            }
+            return null;
+        }
+        
         function getNextWeekday(fromDate, targetDay) {
             const currentDay = fromDate.getDay();
             let daysToAdd = targetDay - currentDay;
@@ -1583,33 +1803,23 @@
         function addTask() {
             const input = document.getElementById('taskInput');
             const rawInput = input.value.trim();
-            
-            // Check if there's a current list selected
-            if (!currentList || !taskLists[currentList]) {
-                alert('Skapa eller välj en lista först.');
-                return;
-            }
-            
+            if (!currentList || !taskLists[currentList]) { showSnackbar('Skapa eller välj en lista först'); return; }
             if (rawInput) {
-                const { title, dueDate } = parseTaskInput(rawInput);
-                
+                const { title, dueDate, dueISO } = parseTaskInput(rawInput);
                 const newTask = {
                     id: Date.now(),
                     title: title,
                     completed: false,
                     priority: "medium",
-                    time: dueDate || null  // No default due date
+                    time: dueDate || null,
+                    dueTs: dueISO ? Date.parse(dueISO) : null
                 };
-                
                 taskLists[currentList].unshift(newTask);
                 input.value = '';
                 saveToLocalStorage();
                 renderTasks();
-                
-                // Haptic feedback simulation
-                if (navigator.vibrate) {
-                    navigator.vibrate(50);
-                }
+                showSnackbar('Uppgift tillagd');
+                if (navigator.vibrate) { navigator.vibrate(50); }
             }
         }
         
@@ -1628,30 +1838,125 @@
             }
         }
         
-        function deleteTask(id) {
-            // Material Design style confirmation would be a Snackbar, but using alert for now
-            if (confirm('Ta bort denna uppgift?')) {
-                taskLists[currentList] = taskLists[currentList].filter(t => t.id !== id);
+        // Snackbar helpers
+        let snackbarTimer = null;
+        let pendingUndo = null;
+        let snackbarAction = () => {};
+        function showSnackbar(message, actionText, actionCb, duration = 4000) {
+            const bar = document.getElementById('snackbar');
+            const text = document.getElementById('snackbarText');
+            const action = document.getElementById('snackbarAction');
+            text.textContent = message;
+            if (actionText && actionCb) {
+                action.style.display = 'inline';
+                action.textContent = actionText;
+                snackbarAction = () => { actionCb(); hideSnackbar(); };
+            } else {
+                action.style.display = 'none';
+                snackbarAction = () => {};
+            }
+            bar.classList.add('show');
+            clearTimeout(snackbarTimer);
+            snackbarTimer = setTimeout(hideSnackbar, duration);
+        }
+        function hideSnackbar() {
+            const bar = document.getElementById('snackbar');
+            bar.classList.remove('show');
+        }
+        // Delete with undo
+        function requestDeleteTask(id) {
+            const tasks = getCurrentTasks();
+            const idx = tasks.findIndex(t => t.id === id);
+            if (idx === -1) return;
+            const removed = tasks.splice(idx, 1)[0];
+            saveToLocalStorage();
+            renderTasks();
+            pendingUndo = () => {
+                tasks.splice(idx, 0, removed);
                 saveToLocalStorage();
                 renderTasks();
-                
-                if (navigator.vibrate) {
-                    navigator.vibrate(100);
-                }
-            }
+            };
+            showSnackbar('Uppgift borttagen', 'Ångra', pendingUndo);
+            if (navigator.vibrate) navigator.vibrate(50);
         }
         
-        function editTask(id) {
+        // Edit modal logic
+        let editingTaskId = null;
+        function openEditTaskModal(id) {
             const tasks = getCurrentTasks();
             const task = tasks.find(t => t.id === id);
-            if (task) {
-                const newTitle = prompt('Redigera uppgift:', task.title);
-                if (newTitle && newTitle.trim()) {
-                    task.title = newTitle.trim();
-                    saveToLocalStorage();
-                    renderTasks();
-                }
+            if (!task) return;
+            editingTaskId = id;
+            const modal = document.getElementById('editTaskModal');
+            const titleInput = document.getElementById('editTaskTitleInput');
+            const dueInput = document.getElementById('editTaskDueInput');
+            titleInput.value = task.title;
+            document.querySelectorAll('input[name="editPriority"]').forEach(r => r.checked = (r.value === task.priority));
+            // Try to parse an ISO date stored in task.time if present
+            const parsed = parseDueToISO(task.time);
+            dueInput.value = parsed || '';
+            modal.setAttribute('aria-hidden', 'false');
+            modal.classList.add('open');
+            enableFocusTrap(modal);
+            setTimeout(() => titleInput.focus(), 100);
+        }
+        function closeEditTaskModal() {
+            const modal = document.getElementById('editTaskModal');
+            modal.setAttribute('aria-hidden', 'true');
+            modal.classList.remove('open');
+            disableFocusTrap(modal);
+            editingTaskId = null;
+        }
+        function saveEditTask() {
+            if (editingTaskId == null) return;
+            const tasks = getCurrentTasks();
+            const task = tasks.find(t => t.id === editingTaskId);
+            if (!task) return;
+            const title = document.getElementById('editTaskTitleInput').value.trim();
+            const prio = document.querySelector('input[name="editPriority"]:checked')?.value || 'medium';
+            const dueISO = document.getElementById('editTaskDueInput').value;
+            if (title) task.title = title;
+            task.priority = prio;
+            task.time = dueISO ? new Date(dueISO).toLocaleDateString('sv-SE', { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' }) : null;
+            task.dueTs = dueISO ? Date.parse(dueISO) : null;
+            saveToLocalStorage();
+            renderTasks();
+            closeEditTaskModal();
+            showSnackbar('Uppgift uppdaterad');
+        }
+        function parseDueToISO(timeLabel) {
+            if (!timeLabel) return null;
+            // Best-effort: if previously saved by us as localized text, we cannot reverse perfectly. Return null.
+            return null;
+        }
+        function quickDue(type) {
+            const input = document.getElementById('editTaskDueInput');
+            const today = new Date();
+            if (type === 'today') {
+                input.valueAsDate = today;
+            } else if (type === 'tomorrow') {
+                const d = new Date(); d.setDate(d.getDate() + 1); input.valueAsDate = d;
+            } else if (type === 'weekend') {
+                const d = new Date();
+                const day = d.getDay();
+                const daysToSat = (6 - day + 7) % 7 || 7; // next Saturday
+                d.setDate(d.getDate() + daysToSat);
+                input.valueAsDate = d;
+            } else if (type === 'clear') {
+                input.value = '';
             }
+        }
+
+        function cyclePriority(id) {
+            const tasks = getCurrentTasks();
+            const task = tasks.find(t => t.id === id);
+            if (!task) return;
+            const order = ['low','medium','high'];
+            const idx = order.indexOf(task.priority);
+            task.priority = order[(idx + 1) % order.length];
+            saveToLocalStorage();
+            renderTasks();
+            showSnackbar(`Prioritet: ${task.priority}`);
         }
         
         function handleKeyPress(event) {
@@ -1661,45 +1966,32 @@
         }
         
         function showTab(tab) {
-            // Remove active class from all tabs
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            
-            // Add active class to clicked tab
             event.target.classList.add('active');
-            
             currentTab = tab;
-            
-            // Reset any swipe states when changing tabs
+            localStorage.setItem('currentTab', tab);
             resetAllSwipeStates();
-            
             renderTasks();
         }
         
         function selectList(listName) {
-            // Remove selected class from all chips
             document.querySelectorAll('.chip').forEach(chip => chip.classList.remove('selected'));
-            
-            // Add selected class to clicked chip - find the chip with matching list name
             const targetChip = Array.from(document.querySelectorAll('.chip')).find(chip => 
                 chip.textContent === getListDisplayName(listName)
             );
-            if (targetChip) {
-                targetChip.classList.add('selected');
-            }
-            
-            // Update current list
+            if (targetChip) { targetChip.classList.add('selected'); }
             currentList = listName;
-            
-            // Save current list selection
             saveToLocalStorage();
-            
-            // Re-render tasks and progress
-            renderTasks();
-            
-            // Haptic feedback
-            if (navigator.vibrate) {
-                navigator.vibrate(50);
+            // Restore toolbar state for this list
+            const toolbarState = JSON.parse(localStorage.getItem('toolbarState') || '{}');
+            const state = toolbarState[currentList || '__global'];
+            if (state) {
+                if (document.getElementById('taskSearch')) document.getElementById('taskSearch').value = state.search || '';
+                if (document.getElementById('taskSort')) document.getElementById('taskSort').value = state.sort || 'default';
+                if (document.getElementById('hideCompletedToggle')) document.getElementById('hideCompletedToggle').checked = !!state.hideCompleted;
             }
+            renderTasks();
+            if (navigator.vibrate) { navigator.vibrate(50); }
         }
         
         function switchList() {
@@ -1735,12 +2027,7 @@
         function toggleMoreMenu() {
             const moreMenu = document.querySelector('.more-menu');
             moreMenu.classList.toggle('open');
-            
-            if (navigator.vibrate) {
-                navigator.vibrate(50);
-            }
-            
-            // Close menu when clicking outside
+            if (navigator.vibrate) { navigator.vibrate(50); }
             setTimeout(() => {
                 document.addEventListener('click', closeMoreMenuOnOutsideClick, { once: true });
             }, 100);
@@ -1779,12 +2066,21 @@
             }).join('');
             
             modal.classList.add('open');
+            enableFocusTrap(modal);
         }
         
         function closeSwitchListModal() {
             const modal = document.getElementById('switchListModal');
             modal.classList.remove('open');
+            disableFocusTrap(modal);
         }
+        // Accessibility: update aria-selected on tabs
+        document.querySelectorAll('.tabs .tab').forEach(btn => {
+            btn.addEventListener('click', function(){
+                document.querySelectorAll('.tabs .tab').forEach(b=>b.setAttribute('aria-selected','false'));
+                this.setAttribute('aria-selected','true');
+            });
+        });
         
         function switchToList(listKey) {
             currentList = listKey;
@@ -1836,11 +2132,13 @@
             }).join('');
             
             modal.classList.add('open');
+            enableFocusTrap(modal);
         }
         
         function closeMyListsModal() {
             const modal = document.getElementById('myListsModal');
             modal.classList.remove('open');
+            disableFocusTrap(modal);
         }
         
         function switchToListFromMyLists(listKey) {
@@ -1862,19 +2160,15 @@
         }
         
         function renameListFromMyLists(listKey) {
-            // Set the list to rename
             currentList = listKey;
-            
             const modal = document.getElementById('renameListModal');
             const input = document.getElementById('renameListName');
-            
-            // Set current list name as value
             input.value = getListDisplayName(listKey);
             input.select();
-            
-            // Close Mina listor modal and open rename modal
             closeMyListsModal();
+            modal.setAttribute('aria-hidden', 'false');
             modal.classList.add('active');
+            enableFocusTrap(modal);
             setTimeout(() => input.focus(), 100);
         }
         
@@ -1921,6 +2215,7 @@
             
             modal.classList.add('open');
             setTimeout(() => input.focus(), 300);
+            enableFocusTrap(modal);
         }
         
         function closeNewListModal() {
@@ -1929,6 +2224,7 @@
             
             modal.classList.remove('open');
             input.value = '';
+            disableFocusTrap(modal);
         }
         
         function createNewList() {
@@ -1955,7 +2251,11 @@
                 const newChip = document.createElement('div');
                 newChip.className = 'chip';
                 newChip.textContent = listName;
+                newChip.setAttribute('role', 'tab');
+                newChip.setAttribute('tabindex', '0');
+                newChip.setAttribute('aria-label', `Välj lista ${listName}`);
                 newChip.onclick = () => selectList(listKey);
+                newChip.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectList(listKey); } };
                 chipsContainer.appendChild(newChip);
                 
                 // Switch to new list
@@ -2001,9 +2301,8 @@
             closeSideMenu();
             const modal = document.getElementById('settingsModal');
             modal.classList.add('open');
-            
-            // Load current settings
             loadSettings();
+            enableFocusTrap(modal);
         }
         
         function showHelp() {
@@ -2020,6 +2319,7 @@
         function closeSettingsModal() {
             const modal = document.getElementById('settingsModal');
             modal.classList.remove('open');
+            disableFocusTrap(modal);
         }
 
         function loadSettings() {
@@ -2175,27 +2475,10 @@
 
         // More Menu Functions
         function sortTasks() {
-            const moreMenu = document.querySelector('.more-menu');
-            moreMenu.classList.remove('open');
-            
-            const tasks = getCurrentTasks();
-            
-            // Sort by priority (high > medium > low) then by completion status
-            tasks.sort((a, b) => {
-                const priorityOrder = { 'high': 3, 'medium': 2, 'low': 1 };
-                
-                if (a.completed !== b.completed) {
-                    return a.completed - b.completed; // Incomplete tasks first
-                }
-                
-                return priorityOrder[b.priority] - priorityOrder[a.priority];
-            });
-            
-            renderTasks();
-            
-            if (navigator.vibrate) {
-                navigator.vibrate(50);
-            }
+            // Legacy: route to toolbar sort dropdown for consistency
+            document.getElementById('taskSort').value = 'priority';
+            applyFilters();
+            if (navigator.vibrate) navigator.vibrate(50);
         }
         
         function exportList() {
@@ -2250,116 +2533,88 @@
         }
         
         function clearCompleted() {
-            const moreMenu = document.querySelector('.more-menu');
-            moreMenu.classList.remove('open');
-            
             const tasks = getCurrentTasks();
-            const completedCount = tasks.filter(task => task.completed).length;
-            
-            if (completedCount === 0) {
-                alert('Inga färdiga uppgifter att rensa!');
-                return;
-            }
-            
-            if (confirm(`Ta bort ${completedCount} färdiga uppgifter?`)) {
-                taskLists[currentList] = tasks.filter(task => !task.completed);
+            const completed = tasks.filter(t => t.completed);
+            const count = completed.length;
+            if (count === 0) { showSnackbar('Inga färdiga uppgifter att rensa'); return; }
+            // Remove but allow undo
+            const remaining = tasks.filter(t => !t.completed);
+            const backup = [...tasks];
+            taskLists[currentList] = remaining;
+            saveToLocalStorage();
+            renderTasks();
+            pendingUndo = () => {
+                taskLists[currentList] = backup;
                 saveToLocalStorage();
                 renderTasks();
-                
-                if (navigator.vibrate) {
-                    navigator.vibrate(100);
-                }
-            }
+            };
+            showSnackbar(`Tog bort ${count} färdiga`, 'Ångra', pendingUndo);
+            if (navigator.vibrate) navigator.vibrate(50);
         }
         
         function deleteList() {
-            const moreMenu = document.querySelector('.more-menu');
-            moreMenu.classList.remove('open');
-            
-            if (Object.keys(taskLists).length <= 1) {
-                alert('Du måste ha minst en lista!');
-                return;
-            }
-            
-            const listName = getListDisplayName(currentList);
-            if (confirm(`Ta bort hela listan "${listName}"? Detta kan inte ångras!`)) {
-                delete taskLists[currentList];
-                
-                // Remove chip from UI
-                document.querySelectorAll('.chip').forEach(chip => {
-                    if (chip.textContent === listName) {
-                        chip.remove();
-                    }
-                });
-                
-                // Switch to first available list
-                currentList = Object.keys(taskLists)[0];
-                document.querySelector('.chip').classList.add('selected');
-                
-                // Save changes to localStorage
+            if (Object.keys(taskLists).length <= 1) { showSnackbar('Du måste ha minst en lista'); return; }
+            const key = currentList;
+            const name = getListDisplayName(key);
+            const backup = { key, name, tasks: taskLists[key] };
+            delete taskLists[key];
+            // Remove chip from UI
+            document.querySelectorAll('.chip').forEach(chip => { if (chip.textContent === name) chip.remove(); });
+            // Switch to first available list
+            currentList = Object.keys(taskLists)[0] || null;
+            const firstChip = document.querySelector('.chip');
+            if (firstChip) firstChip.classList.add('selected');
+            saveToLocalStorage();
+            renderTasks();
+            pendingUndo = () => {
+                taskLists[backup.key] = backup.tasks;
+                // Recreate chip
+                const chipsContainer = document.querySelector('.list-chips');
+                const newChip = document.createElement('div');
+                newChip.className = 'chip';
+                newChip.textContent = backup.name;
+                newChip.onclick = () => selectList(backup.key);
+                chipsContainer.appendChild(newChip);
+                selectList(backup.key);
                 saveToLocalStorage();
-                
-                renderTasks();
-                
-                if (navigator.vibrate) {
-                    navigator.vibrate([100, 50, 100]);
-                }
-            }
+            };
+            showSnackbar(`Listan "${name}" borttagen`, 'Ångra', pendingUndo);
+            if (navigator.vibrate) navigator.vibrate(50);
         }
         
         function renameList() {
             const moreMenu = document.querySelector('.more-menu');
             moreMenu.classList.remove('open');
-            
             const modal = document.getElementById('renameListModal');
             const input = document.getElementById('renameListName');
-            
-            // Set current list name as placeholder
             input.value = getListDisplayName(currentList);
             input.select();
-            
+            modal.setAttribute('aria-hidden', 'false');
             modal.classList.add('active');
+            enableFocusTrap(modal);
             setTimeout(() => input.focus(), 100);
         }
         
         function closeRenameListModal() {
             const modal = document.getElementById('renameListModal');
             modal.classList.remove('active');
+            modal.setAttribute('aria-hidden', 'true');
             document.getElementById('renameListName').value = '';
         }
         
         function confirmRenameList() {
             const input = document.getElementById('renameListName');
             const newName = input.value.trim();
-            
-            if (!newName) {
-                alert('Ange ett namn för listan!');
-                return;
-            }
-            
-            // Update the display name
+            if (!newName) { showSnackbar('Ange ett namn för listan'); return; }
             setListDisplayName(currentList, newName);
-            
-            // Update the chip in the UI
             document.querySelectorAll('.chip').forEach(chip => {
-                if (chip.classList.contains('selected')) {
-                    chip.textContent = newName;
-                }
+                if (chip.classList.contains('selected')) { chip.textContent = newName; }
             });
-            
-            // Close modal
             closeRenameListModal();
-            
-            // If Mina listor modal was open, refresh it
             const myListsModal = document.getElementById('myListsModal');
-            if (myListsModal.classList.contains('open')) {
-                showMyListsModal();
-            }
-            
-            // Vibration feedback
-            if (navigator.vibrate) {
-                navigator.vibrate(50);
-            }
+            if (myListsModal.classList.contains('open')) { showMyListsModal(); }
+            if (navigator.vibrate) navigator.vibrate(50);
+            showSnackbar('Listnamn uppdaterat');
         }
         
         // Local Storage Functions
@@ -2413,7 +2668,6 @@
             Object.keys(taskLists).forEach(listKey => {
                 const listName = getListDisplayName(listKey);
                 
-                // Check if chip already exists
                 const existingChip = Array.from(chipsContainer.children).find(chip => 
                     chip.textContent === listName
                 );
@@ -2422,59 +2676,123 @@
                     const newChip = document.createElement('div');
                     newChip.className = 'chip';
                     newChip.textContent = listName;
+                    newChip.setAttribute('role', 'tab');
+                    newChip.setAttribute('tabindex', '0');
+                    newChip.setAttribute('aria-label', `Välj lista ${listName}`);
                     newChip.onclick = () => selectList(listKey);
-                    
-                    // Mark as selected if it's the current list
-                    if (listKey === currentList) {
-                        newChip.classList.add('selected');
-                    }
-                    
+                    newChip.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectList(listKey); } };
+                    if (listKey === currentList) { newChip.classList.add('selected'); }
                     chipsContainer.appendChild(newChip);
                 }
             });
         }
 
+        function applyFilters() {
+            // Persist toolbar selections per list
+            const state = JSON.parse(localStorage.getItem('toolbarState') || '{}');
+            const listKey = currentList || '__global';
+            state[listKey] = {
+                search: document.getElementById('taskSearch')?.value || '',
+                sort: document.getElementById('taskSort')?.value || 'default',
+                hideCompleted: document.getElementById('hideCompletedToggle')?.checked || false,
+            };
+            localStorage.setItem('toolbarState', JSON.stringify(state));
+            renderTasks();
+        }
+
         // Initialize the app
         document.addEventListener('DOMContentLoaded', function() {
-            // Try to load from localStorage first
             const hasData = loadFromLocalStorage();
-            
-            // If no saved data, start with empty task lists
-            if (!hasData) {
-                taskLists = {};
-                currentList = null;
+            if (!hasData) { taskLists = {}; currentList = null; }
+            // Restore tab
+            const savedTab = localStorage.getItem('currentTab');
+            if (savedTab) {
+                currentTab = savedTab;
+                const idx = { all: 0, active: 1, completed: 2 }[savedTab] ?? 0;
+                const tabs = document.querySelectorAll('.tab');
+                tabs.forEach(t => t.classList.remove('active'));
+                if (tabs[idx]) tabs[idx].classList.add('active');
             }
-            
+            // Restore toolbar state
+            const toolbarState = JSON.parse(localStorage.getItem('toolbarState') || '{}');
+            const state = toolbarState[currentList || '__global'];
+            if (state) {
+                if (document.getElementById('taskSearch')) document.getElementById('taskSearch').value = state.search || '';
+                if (document.getElementById('taskSort')) document.getElementById('taskSort').value = state.sort || 'default';
+                if (document.getElementById('hideCompletedToggle')) document.getElementById('hideCompletedToggle').checked = !!state.hideCompleted;
+            }
+            // Show swipe hint once
+            try {
+                const seen = localStorage.getItem('seenSwipeHint');
+                const hint = document.getElementById('swipeHint');
+                if (hint && !seen) { hint.classList.add('show'); }
+            } catch {}
             renderTasks();
-            
-            // Initialize settings event listeners
             initializeSettingsListeners();
-            
             // Close modals when clicking outside
             document.addEventListener('click', function(event) {
                 const modals = document.querySelectorAll('.modal');
                 modals.forEach(modal => {
-                    if (modal.classList.contains('open') && event.target === modal) {
+                    if (event.target === modal && (modal.classList.contains('open') || modal.classList.contains('active'))) {
                         modal.classList.remove('open');
+                        modal.classList.remove('active');
+                        modal.setAttribute('aria-hidden', 'true');
                     }
                 });
             });
-            
-            // Handle Enter key in new list modal
             document.getElementById('newListName').addEventListener('keypress', function(event) {
-                if (event.key === 'Enter') {
-                    createNewList();
-                }
+                if (event.key === 'Enter') { createNewList(); }
             });
-            
-            // Handle Enter key in rename list modal
             document.getElementById('renameListName').addEventListener('keypress', function(event) {
-                if (event.key === 'Enter') {
-                    confirmRenameList();
+                if (event.key === 'Enter') { confirmRenameList(); }
+            });
+            // Keyboard: Escape closes topmost modal
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    const openModals = Array.from(document.querySelectorAll('.modal.open, .modal.active'));
+                    const top = openModals.pop();
+                    if (top) top.classList.remove('open', 'active');
                 }
             });
         });
         
+        function dismissSwipeHint() {
+            const hint = document.getElementById('swipeHint');
+            if (hint) hint.classList.remove('show');
+            try { localStorage.setItem('seenSwipeHint', '1'); } catch {}
+        }
+
+        // Focus trap for modals
+        const focusTrap = { modal: null, handler: null, previouslyFocused: null };
+        function enableFocusTrap(modal) {
+            disableFocusTrap();
+            focusTrap.modal = modal;
+            focusTrap.previouslyFocused = document.activeElement;
+            const focusableSelectors = 'a[href], button:not([disabled]), input, select, textarea, [tabindex]:not([tabindex="-1"])';
+            const focusables = Array.from(modal.querySelectorAll(focusableSelectors)).filter(el => el.offsetParent !== null);
+            const first = focusables[0] || modal;
+            const last = focusables[focusables.length - 1] || modal;
+            focusTrap.handler = (e) => {
+                if (e.key === 'Tab') {
+                    if (focusables.length === 0) { e.preventDefault(); return; }
+                    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+                    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+                }
+            };
+            modal.addEventListener('keydown', focusTrap.handler);
+            setTimeout(() => first.focus(), 0);
+        }
+        function disableFocusTrap(targetModal) {
+            if (!focusTrap.modal) return;
+            if (targetModal && targetModal !== focusTrap.modal) return;
+            focusTrap.modal.removeEventListener('keydown', focusTrap.handler);
+            if (focusTrap.previouslyFocused && typeof focusTrap.previouslyFocused.focus === 'function') {
+                focusTrap.previouslyFocused.focus();
+            }
+            focusTrap.modal = null;
+            focusTrap.handler = null;
+            focusTrap.previouslyFocused = null;
+        }
 
     </script>
 </body>
