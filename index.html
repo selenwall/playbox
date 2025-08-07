@@ -662,7 +662,6 @@
             justify-content: space-between;
             padding: 12px 0;
             border-bottom: 1px solid #f0f0f0;
-            cursor: pointer;
             transition: background 0.2s;
         }
         
@@ -676,6 +675,7 @@
         
         .list-info {
             flex: 1;
+            cursor: pointer;
         }
         
         .list-name {
@@ -687,6 +687,42 @@
         .list-count {
             font-size: 12px;
             color: #757575;
+        }
+        
+        .list-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        
+        .action-btn {
+            background: none;
+            border: none;
+            padding: 8px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+        }
+        
+        .action-btn:hover {
+            background: #f0f0f0;
+        }
+        
+        .action-btn.delete:hover {
+            background: #ffebee;
+            color: #d32f2f;
+        }
+        
+        .active-indicator {
+            color: #1976d2;
+            font-weight: bold;
+            margin-left: 8px;
         }
         
         .modal-buttons {
@@ -936,9 +972,9 @@
             <div class="menu-title">Todo Lists</div>
             <div class="menu-subtitle">Hantera dina listor</div>
         </div>
-        <div class="menu-item" onclick="showAllLists()">
+        <div class="menu-item" onclick="showMyLists()">
             <div class="menu-icon-item">📝</div>
-            <div class="menu-text">Alla listor</div>
+            <div class="menu-text">Mina listor</div>
         </div>
         <div class="menu-item" onclick="showStatistics()">
             <div class="menu-icon-item">📊</div>
@@ -964,8 +1000,6 @@
         <div class="more-menu-item" onclick="exportList()">Exportera lista</div>
         <div class="more-menu-item" onclick="shareList()">Dela lista</div>
         <div class="more-menu-item" onclick="clearCompleted()">Rensa färdiga</div>
-        <div class="more-menu-item" onclick="renameList()">Byt namn på lista</div>
-        <div class="more-menu-item" onclick="deleteList()">Ta bort lista</div>
     </div>
 
     <!-- Switch List Modal -->
@@ -977,6 +1011,19 @@
             </div>
             <div class="modal-buttons">
                 <button class="modal-btn cancel" onclick="closeSwitchListModal()">Avbryt</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mina listor Modal -->
+    <div class="modal" id="myListsModal">
+        <div class="modal-content">
+            <div class="modal-title">Mina listor</div>
+            <div class="modal-list" id="myListsContainer">
+                <!-- Lists will be populated here -->
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-btn cancel" onclick="closeMyListsModal()">Stäng</button>
             </div>
         </div>
     </div>
@@ -1485,6 +1532,112 @@
             }
         }
         
+        // Mina listor Modal Functions
+        function showMyListsModal() {
+            const modal = document.getElementById('myListsModal');
+            const container = document.getElementById('myListsContainer');
+            
+            // Populate lists with rename and delete options
+            container.innerHTML = Object.keys(taskLists).map(listKey => {
+                const tasks = taskLists[listKey];
+                const totalTasks = tasks.length;
+                const completedTasks = tasks.filter(task => task.completed).length;
+                const isActive = listKey === currentList;
+                
+                return `
+                    <div class="modal-list-item ${isActive ? 'active' : ''}">
+                        <div class="list-info" onclick="switchToListFromMyLists('${listKey}')">
+                            <div class="list-name">${getListDisplayName(listKey)}</div>
+                            <div class="list-count">${completedTasks} av ${totalTasks} klara</div>
+                        </div>
+                        <div class="list-actions">
+                            <button class="action-btn" onclick="renameListFromMyLists('${listKey}')" title="Byt namn">✏️</button>
+                            <button class="action-btn delete" onclick="deleteListFromMyLists('${listKey}')" title="Ta bort">🗑️</button>
+                        </div>
+                        ${isActive ? '<div class="active-indicator">✓</div>' : ''}
+                    </div>
+                `;
+            }).join('');
+            
+            modal.classList.add('open');
+        }
+        
+        function closeMyListsModal() {
+            const modal = document.getElementById('myListsModal');
+            modal.classList.remove('open');
+        }
+        
+        function switchToListFromMyLists(listKey) {
+            currentList = listKey;
+            
+            // Update chip selection
+            document.querySelectorAll('.chip').forEach(chip => {
+                chip.classList.remove('selected');
+                if (chip.textContent === getListDisplayName(listKey)) {
+                    chip.classList.add('selected');
+                }
+            });
+            
+            // Save current list selection
+            saveToLocalStorage();
+            
+            renderTasks();
+            closeMyListsModal();
+        }
+        
+        function renameListFromMyLists(listKey) {
+            // Set the list to rename
+            currentList = listKey;
+            
+            const modal = document.getElementById('renameListModal');
+            const input = document.getElementById('renameListName');
+            
+            // Set current list name as value
+            input.value = getListDisplayName(listKey);
+            input.select();
+            
+            // Close Mina listor modal and open rename modal
+            closeMyListsModal();
+            modal.classList.add('active');
+            setTimeout(() => input.focus(), 100);
+        }
+        
+        function deleteListFromMyLists(listKey) {
+            if (Object.keys(taskLists).length <= 1) {
+                alert('Du måste ha minst en lista!');
+                return;
+            }
+            
+            const listName = getListDisplayName(listKey);
+            if (confirm(`Ta bort hela listan "${listName}"? Detta kan inte ångras!`)) {
+                delete taskLists[listKey];
+                
+                // Remove chip from UI if it exists
+                document.querySelectorAll('.chip').forEach(chip => {
+                    if (chip.textContent === listName) {
+                        chip.remove();
+                    }
+                });
+                
+                // If we deleted the current list, switch to first available list
+                if (listKey === currentList) {
+                    currentList = Object.keys(taskLists)[0];
+                    document.querySelector('.chip').classList.add('selected');
+                    renderTasks();
+                }
+                
+                // Save changes to localStorage
+                saveToLocalStorage();
+                
+                // Refresh the modal
+                showMyListsModal();
+                
+                if (navigator.vibrate) {
+                    navigator.vibrate([100, 50, 100]);
+                }
+            }
+        }
+        
         // New List Modal Functions
         function showNewListModal() {
             const modal = document.getElementById('newListModal');
@@ -1552,9 +1705,9 @@
         }
         
         // Side Menu Item Functions
-        function showAllLists() {
+        function showMyLists() {
             closeSideMenu();
-            showSwitchListModal();
+            showMyListsModal();
         }
         
         function showStatistics() {
@@ -1920,6 +2073,12 @@
             
             // Close modal
             closeRenameListModal();
+            
+            // If Mina listor modal was open, refresh it
+            const myListsModal = document.getElementById('myListsModal');
+            if (myListsModal.classList.contains('open')) {
+                showMyListsModal();
+            }
             
             // Vibration feedback
             if (navigator.vibrate) {
