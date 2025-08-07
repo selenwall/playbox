@@ -229,24 +229,33 @@
             background: white;
         }
         
+        .task-item-wrapper {
+            position: relative;
+            overflow: hidden;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .task-item-wrapper:last-child {
+            border-bottom: none;
+        }
+
         .task-item {
             display: flex;
             align-items: center;
             padding: 16px;
-            border-bottom: 1px solid #f0f0f0;
             background: white;
-            transition: background 0.2s;
+            transition: transform 0.3s ease, background 0.2s;
             position: relative;
             cursor: pointer;
+            z-index: 1;
+            touch-action: pan-y;
         }
         
         .task-item:active {
             background: #f8f8f8;
         }
         
-        .task-item:last-child {
-            border-bottom: none;
-        }
+
         
         /* Custom checkbox */
         .task-checkbox {
@@ -726,6 +735,97 @@
             font-weight: bold;
             margin-left: 8px;
         }
+
+        /* Swipe Actions */
+        .swipe-actions {
+            position: absolute;
+            top: 0;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            z-index: 0;
+            width: 160px;
+        }
+
+        .swipe-left-actions {
+            right: 0;
+            background: #f44336;
+        }
+
+        .swipe-right-actions {
+            left: 0;
+            background: #4caf50;
+            width: 80px;
+        }
+
+        .swipe-action-btn {
+            height: 100%;
+            border: none;
+            padding: 0 24px;
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-width: 80px;
+            transition: background 0.2s;
+            gap: 4px;
+        }
+
+        .edit-btn {
+            background: #ff9800;
+        }
+
+        .edit-btn:hover {
+            background: #f57c00;
+        }
+
+        .delete-btn {
+            background: #f44336;
+        }
+
+        .delete-btn:hover {
+            background: #d32f2f;
+        }
+
+        .complete-btn {
+            background: #4caf50;
+        }
+
+        .complete-btn:hover {
+            background: #388e3c;
+        }
+
+        .swipe-icon {
+            font-size: 18px;
+            line-height: 1;
+        }
+
+        .swipe-label {
+            font-size: 11px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Swipe states */
+        .task-item.swiping-left {
+            transform: translateX(-160px);
+        }
+
+        .task-item.swiping-right {
+            transform: translateX(80px);
+        }
+
+        .task-item.swipe-left-revealed .swipe-left-actions {
+            display: flex;
+        }
+
+        .task-item.swipe-right-revealed .swipe-right-actions {
+            display: flex;
+        }
         
         .modal-buttons {
             display: flex;
@@ -1184,25 +1284,183 @@
                 `;
             } else {
                 tasksList.innerHTML = filteredTasks.map(task => `
-                    <div class="task-item" onclick="toggleTask(${task.id})">
-                        <div class="priority-indicator priority-${task.priority}"></div>
-                        <div class="task-checkbox ${task.completed ? 'checked' : ''}"></div>
-                        <div class="task-content">
-                            <div class="task-title ${task.completed ? 'completed' : ''}">${task.title}</div>
-                            <div class="task-meta">
-                                ${task.time ? `<div class="task-time">${task.time}</div>` : ''}
-                            </div>
+                    <div class="task-item-wrapper" data-task-id="${task.id}">
+                        <div class="swipe-actions swipe-left-actions">
+                            <button class="swipe-action-btn edit-btn" onclick="editTask(${task.id})">
+                                <span class="swipe-icon">✏️</span>
+                                <span class="swipe-label">Redigera</span>
+                            </button>
+                            <button class="swipe-action-btn delete-btn" onclick="deleteTask(${task.id})">
+                                <span class="swipe-icon">🗑️</span>
+                                <span class="swipe-label">Ta bort</span>
+                            </button>
                         </div>
-                        <div class="task-actions">
-                            <button class="task-action-btn" onclick="event.stopPropagation(); editTask(${task.id})">✏️</button>
-                            <button class="task-action-btn delete" onclick="event.stopPropagation(); deleteTask(${task.id})">🗑️</button>
+                        <div class="swipe-actions swipe-right-actions">
+                            <button class="swipe-action-btn complete-btn" onclick="toggleTask(${task.id})">
+                                <span class="swipe-icon">${task.completed ? '↶' : '✓'}</span>
+                                <span class="swipe-label">${task.completed ? 'Ångra' : 'Klar'}</span>
+                            </button>
+                        </div>
+                        <div class="task-item" data-task-id="${task.id}">
+                            <div class="priority-indicator priority-${task.priority}"></div>
+                            <div class="task-checkbox ${task.completed ? 'checked' : ''}"></div>
+                            <div class="task-content">
+                                <div class="task-title ${task.completed ? 'completed' : ''}">${task.title}</div>
+                                <div class="task-meta">
+                                    ${task.time ? `<div class="task-time">${task.time}</div>` : ''}
+                                </div>
+                            </div>
+                            <div class="task-actions">
+                                <button class="task-action-btn" onclick="event.stopPropagation(); editTask(${task.id})">✏️</button>
+                                <button class="task-action-btn delete" onclick="event.stopPropagation(); deleteTask(${task.id})">🗑️</button>
+                            </div>
                         </div>
                     </div>
                 `).join('');
             }
             
             updateProgress();
+            
+            // Initialize swipe handlers for new task items
+            initializeSwipeHandlers();
         }
+        
+        // Swipe functionality
+        function initializeSwipeHandlers() {
+            const taskItems = document.querySelectorAll('.task-item');
+            
+            taskItems.forEach(taskItem => {
+                let startX = 0;
+                let currentX = 0;
+                let isSwipeActive = false;
+                let startTime = 0;
+                
+                // Remove existing event listeners to prevent duplicates
+                taskItem.removeEventListener('touchstart', handleTouchStart);
+                taskItem.removeEventListener('touchmove', handleTouchMove);
+                taskItem.removeEventListener('touchend', handleTouchEnd);
+                taskItem.removeEventListener('click', handleClick);
+                
+                function handleTouchStart(e) {
+                    startX = e.touches[0].clientX;
+                    currentX = startX;
+                    startTime = Date.now();
+                    isSwipeActive = true;
+                    
+                    // Reset any existing swipe state
+                    resetSwipeState(taskItem);
+                    
+                    // Prevent default behavior
+                    e.preventDefault();
+                }
+                
+                function handleTouchMove(e) {
+                    if (!isSwipeActive) return;
+                    
+                    currentX = e.touches[0].clientX;
+                    const diffX = currentX - startX;
+                    
+                    // Only allow horizontal swipes with minimum movement
+                    if (Math.abs(diffX) > 10) {
+                        e.preventDefault();
+                        
+                        // Apply transform based on swipe direction
+                        if (diffX < 0) {
+                            // Swiping left - show edit/delete actions
+                            const translateX = Math.max(diffX, -160);
+                            taskItem.style.transform = `translateX(${translateX}px)`;
+                        } else {
+                            // Swiping right - show complete action
+                            const translateX = Math.min(diffX, 80);
+                            taskItem.style.transform = `translateX(${translateX}px)`;
+                        }
+                    }
+                }
+                
+                function handleTouchEnd(e) {
+                    if (!isSwipeActive) return;
+                    
+                    isSwipeActive = false;
+                    const diffX = currentX - startX;
+                    const diffTime = Date.now() - startTime;
+                    const velocity = Math.abs(diffX) / diffTime;
+                    
+                    // Determine if swipe should trigger action or snap back
+                    if (Math.abs(diffX) > 60 || velocity > 0.5) {
+                        if (diffX < 0) {
+                            // Swipe left - reveal edit/delete actions
+                            taskItem.style.transform = 'translateX(-160px)';
+                            taskItem.classList.add('swiped-left');
+                        } else {
+                            // Swipe right - reveal complete action
+                            taskItem.style.transform = 'translateX(80px)';
+                            taskItem.classList.add('swiped-right');
+                        }
+                    } else {
+                        // Snap back to original position
+                        resetSwipeState(taskItem);
+                    }
+                    
+                    e.preventDefault();
+                }
+                
+                function handleClick(e) {
+                    // If item is swiped, reset instead of toggling
+                    if (taskItem.classList.contains('swiped-left') || taskItem.classList.contains('swiped-right')) {
+                        resetSwipeState(taskItem);
+                        e.preventDefault();
+                        e.stopPropagation();
+                        return false;
+                    }
+                    
+                    // Normal click behavior for toggling task
+                    const taskId = parseInt(taskItem.dataset.taskId);
+                    toggleTask(taskId);
+                }
+                
+                // Add event listeners for touch
+                taskItem.addEventListener('touchstart', handleTouchStart, { passive: false });
+                taskItem.addEventListener('touchmove', handleTouchMove, { passive: false });
+                taskItem.addEventListener('touchend', handleTouchEnd, { passive: false });
+                
+                // Add mouse event listeners for desktop testing
+                taskItem.addEventListener('mousedown', (e) => {
+                    handleTouchStart({ touches: [{ clientX: e.clientX }] });
+                });
+                
+                taskItem.addEventListener('mousemove', (e) => {
+                    if (isSwipeActive) {
+                        handleTouchMove({ touches: [{ clientX: e.clientX }] });
+                    }
+                });
+                
+                taskItem.addEventListener('mouseup', (e) => {
+                    if (isSwipeActive) {
+                        handleTouchEnd({});
+                    }
+                });
+                
+                taskItem.addEventListener('click', handleClick);
+            });
+        }
+        
+        function resetSwipeState(taskItem) {
+            taskItem.style.transform = 'translateX(0)';
+            taskItem.classList.remove('swiped-left', 'swiped-right');
+        }
+        
+        // Reset all swipe states when needed
+        function resetAllSwipeStates() {
+            const taskItems = document.querySelectorAll('.task-item');
+            taskItems.forEach(resetSwipeState);
+        }
+        
+        // Add global click handler to reset swipe states when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.task-item-wrapper')) {
+                resetAllSwipeStates();
+            }
+        });
         
         function updateProgress() {
             const tasks = getCurrentTasks();
@@ -1398,6 +1656,10 @@
             event.target.classList.add('active');
             
             currentTab = tab;
+            
+            // Reset any swipe states when changing tabs
+            resetAllSwipeStates();
+            
             renderTasks();
         }
         
