@@ -964,6 +964,7 @@
         <div class="more-menu-item" onclick="exportList()">Exportera lista</div>
         <div class="more-menu-item" onclick="shareList()">Dela lista</div>
         <div class="more-menu-item" onclick="clearCompleted()">Rensa färdiga</div>
+        <div class="more-menu-item" onclick="renameList()">Byt namn på lista</div>
         <div class="more-menu-item" onclick="deleteList()">Ta bort lista</div>
     </div>
 
@@ -1036,6 +1037,18 @@
 
             <div class="modal-buttons">
                 <button class="modal-btn cancel" onclick="closeSettingsModal()">Stäng</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rename List Modal -->
+    <div class="modal" id="renameListModal">
+        <div class="modal-content">
+            <div class="modal-title">Byt namn på lista</div>
+            <input type="text" class="modal-input" id="renameListName" placeholder="Nytt namn på lista...">
+            <div class="modal-buttons">
+                <button class="modal-btn cancel" onclick="closeRenameListModal()">Avbryt</button>
+                <button class="modal-btn primary" onclick="confirmRenameList()">Byt namn</button>
             </div>
         </div>
     </div>
@@ -1528,8 +1541,14 @@
         }
         
         function getListDisplayName(listKey) {
-            const displayNames = {};
+            const displayNames = JSON.parse(localStorage.getItem('listDisplayNames') || '{}');
             return displayNames[listKey] || listKey.charAt(0).toUpperCase() + listKey.slice(1);
+        }
+        
+        function setListDisplayName(listKey, displayName) {
+            const displayNames = JSON.parse(localStorage.getItem('listDisplayNames') || '{}');
+            displayNames[listKey] = displayName;
+            localStorage.setItem('listDisplayNames', JSON.stringify(displayNames));
         }
         
         // Side Menu Item Functions
@@ -1859,6 +1878,55 @@
             }
         }
         
+        function renameList() {
+            const moreMenu = document.querySelector('.more-menu');
+            moreMenu.classList.remove('open');
+            
+            const modal = document.getElementById('renameListModal');
+            const input = document.getElementById('renameListName');
+            
+            // Set current list name as placeholder
+            input.value = getListDisplayName(currentList);
+            input.select();
+            
+            modal.classList.add('active');
+            setTimeout(() => input.focus(), 100);
+        }
+        
+        function closeRenameListModal() {
+            const modal = document.getElementById('renameListModal');
+            modal.classList.remove('active');
+            document.getElementById('renameListName').value = '';
+        }
+        
+        function confirmRenameList() {
+            const input = document.getElementById('renameListName');
+            const newName = input.value.trim();
+            
+            if (!newName) {
+                alert('Ange ett namn för listan!');
+                return;
+            }
+            
+            // Update the display name
+            setListDisplayName(currentList, newName);
+            
+            // Update the chip in the UI
+            document.querySelectorAll('.chip').forEach(chip => {
+                if (chip.classList.contains('selected')) {
+                    chip.textContent = newName;
+                }
+            });
+            
+            // Close modal
+            closeRenameListModal();
+            
+            // Vibration feedback
+            if (navigator.vibrate) {
+                navigator.vibrate(50);
+            }
+        }
+        
         // Local Storage Functions
         function saveToLocalStorage() {
             try {
@@ -1961,6 +2029,13 @@
             document.getElementById('newListName').addEventListener('keypress', function(event) {
                 if (event.key === 'Enter') {
                     createNewList();
+                }
+            });
+            
+            // Handle Enter key in rename list modal
+            document.getElementById('renameListName').addEventListener('keypress', function(event) {
+                if (event.key === 'Enter') {
+                    confirmRenameList();
                 }
             });
         });
