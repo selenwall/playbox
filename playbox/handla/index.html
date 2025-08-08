@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Handla — Groceries</title>
+    <meta name="description" content="Simple groceries app: add, edit, delete, and sort items with automatic category detection." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header class="app-header">
+      <div class="container header-content">
+        <h1>Handla</h1>
+        <div class="controls">
+          <div class="search">
+            <input id="searchInput" type="search" placeholder="Search items…" aria-label="Search items" />
+          </div>
+          <div class="sort">
+            <label for="sortSelect">Sort</label>
+            <select id="sortSelect" aria-label="Sort items">
+              <option value="recent">Recently added</option>
+              <option value="name">Name A→Z</option>
+              <option value="category">Category A→Z</option>
+            </select>
+          </div>
+          <button id="clearAllBtn" class="btn btn-ghost" title="Clear all items" aria-label="Clear all items">Clear</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="container">
+      <section class="add-item">
+        <form id="addForm" autocomplete="off">
+          <input id="nameInput" type="text" placeholder="Add a grocery (e.g., milk, apples, bread)" aria-label="Grocery name" required />
+          <input id="qtyInput" type="number" inputmode="numeric" min="1" placeholder="Qty" aria-label="Quantity" />
+          <button type="submit" class="btn">Add</button>
+        </form>
+        <p class="hint">Category is detected automatically. You can adjust it when editing an item.</p>
+      </section>
+
+      <section>
+        <ul id="itemsList" class="items" aria-live="polite" aria-label="Groceries list"></ul>
+      </section>
+    </main>
+
+    <template id="itemTemplate">
+      <li class="item" data-id="">
+        <div class="item-main">
+          <span class="category-chip" data-category="Other">Other</span>
+          <div class="item-text">
+            <span class="item-name"></span>
+            <span class="item-qty"></span>
+          </div>
+        </div>
+        <div class="item-actions">
+          <button class="btn-icon edit" title="Edit" aria-label="Edit item">✎</button>
+          <button class="btn-icon delete" title="Delete" aria-label="Delete item">🗑️</button>
+        </div>
+        <div class="item-edit" hidden>
+          <div class="edit-row">
+            <input class="edit-name" type="text" aria-label="Edit name" />
+            <input class="edit-qty" type="number" min="1" aria-label="Edit quantity" />
+          </div>
+          <div class="edit-row">
+            <label class="edit-label" for="">Category</label>
+            <select class="edit-category" aria-label="Edit category">
+              <option value="__auto__">Auto (recommended)</option>
+              <option>Dairy</option>
+              <option>Bakery</option>
+              <option>Produce</option>
+              <option>Meat</option>
+              <option>Seafood</option>
+              <option>Pantry</option>
+              <option>Frozen</option>
+              <option>Beverages</option>
+              <option>Snacks</option>
+              <option>Household</option>
+              <option>Personal Care</option>
+              <option>Deli</option>
+              <option>Eggs</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="edit-actions">
+            <button class="btn save">Save</button>
+            <button class="btn btn-ghost cancel">Cancel</button>
+          </div>
+        </div>
+      </li>
+    </template>
+
+    <footer class="footer">
+      <div class="container">
+        <small>Handla — local-only. Data is saved in your browser.</small>
+      </div>
+    </footer>
+
+    <script src="app.js" type="module"></script>
+  </body>
+</html>

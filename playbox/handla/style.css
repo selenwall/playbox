@@ -1,0 +1,208 @@
+:root {
+  --bg: #0b0f14;
+  --panel: #111827;
+  --panel-2: #0f172a;
+  --text: #e5e7eb;
+  --muted: #9ca3af;
+  --primary: #4f46e5;
+  --primary-600: #4338ca;
+  --danger: #ef4444;
+  --border: #1f2937;
+  --chip-bg: #111827;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+  background: linear-gradient(180deg, var(--panel-2), var(--bg));
+  color: var(--text);
+}
+
+.container {
+  width: min(980px, 92vw);
+  margin: 0 auto;
+}
+
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: rgba(17, 24, 39, 0.85);
+  backdrop-filter: blur(6px);
+  border-bottom: 1px solid var(--border);
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 0;
+}
+
+h1 {
+  font-size: 22px;
+  margin: 0;
+}
+
+.controls {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.controls .search input {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 10px 12px;
+  border-radius: 10px;
+  width: 260px;
+}
+
+.controls .sort select {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 10px 12px;
+  border-radius: 10px;
+}
+
+.btn, .btn-ghost, .btn-icon {
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--text);
+  padding: 10px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.btn:hover { background: var(--primary); border-color: var(--primary-600); }
+.btn:active { transform: translateY(1px); }
+
+.btn-ghost { background: transparent; }
+.btn-ghost:hover { background: var(--panel); }
+
+.btn-icon {
+  padding: 8px 10px;
+  line-height: 1;
+}
+
+main { padding: 20px 0 60px; }
+
+.add-item form {
+  display: flex;
+  gap: 10px;
+}
+
+.add-item input[type="text"], .add-item input[type="number"] {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 12px 14px;
+  border-radius: 12px;
+}
+
+.add-item input#nameInput { flex: 1; }
+.add-item input#qtyInput { width: 120px; }
+
+.hint {
+  color: var(--muted);
+  margin-top: 8px;
+}
+
+.items {
+  list-style: none;
+  padding: 0;
+  margin: 24px 0 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 12px;
+}
+
+.item {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
+  align-items: center;
+  padding: 14px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+}
+
+.item-main {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.item-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.item-name { font-weight: 600; }
+.item-qty { color: var(--muted); font-size: 13px; }
+
+.item-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.category-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  background: var(--chip-bg);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  min-width: 64px;
+  text-align: center;
+}
+
+.item-edit {
+  grid-column: 1 / -1;
+  display: grid;
+  gap: 8px;
+}
+
+.edit-row { display: flex; gap: 10px; }
+.edit-row input, .edit-row select {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 10px 12px;
+  border-radius: 10px;
+}
+
+.edit-row .edit-name { flex: 1; }
+.edit-row .edit-qty { width: 120px; }
+
+.edit-actions { display: flex; gap: 8px; }
+
+.footer { border-top: 1px solid var(--border); padding: 18px 0; color: var(--muted); }
+
+/* Category accent colors (border-only for subtlety) */
+.category-chip[data-category="Dairy"] { border-color: #93c5fd; color: #bfdbfe; }
+.category-chip[data-category="Bakery"] { border-color: #fbbf24; color: #fde68a; }
+.category-chip[data-category="Produce"] { border-color: #34d399; color: #a7f3d0; }
+.category-chip[data-category="Meat"] { border-color: #f87171; color: #fecaca; }
+.category-chip[data-category="Seafood"] { border-color: #60a5fa; color: #bfdbfe; }
+.category-chip[data-category="Pantry"] { border-color: #c084fc; color: #e9d5ff; }
+.category-chip[data-category="Frozen"] { border-color: #67e8f9; color: #a5f3fc; }
+.category-chip[data-category="Beverages"] { border-color: #7dd3fc; color: #bae6fd; }
+.category-chip[data-category="Snacks"] { border-color: #f472b6; color: #fbcfe8; }
+.category-chip[data-category="Household"] { border-color: #e5e7eb; color: #f3f4f6; }
+.category-chip[data-category="Personal Care"] { border-color: #d1fae5; color: #a7f3d0; }
+.category-chip[data-category="Deli"] { border-color: #fca5a5; color: #fecaca; }
+.category-chip[data-category="Eggs"] { border-color: #fde68a; color: #fef3c7; }
