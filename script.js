@@ -238,51 +238,142 @@ function goBackToPhoto() {
 
 // Share items using Web Share API
 async function shareItems() {
+    console.log('Share items clicked');
+    console.log('Detected items:', gameState.detectedItems);
+    
+    if (!gameState.detectedItems || gameState.detectedItems.length === 0) {
+        showStatus('No items to share! Take a photo first.', 'error');
+        return;
+    }
+    
     const itemsText = gameState.detectedItems.join(', ');
     const shareText = `🎯 Location Guessing Game!\n\nI found these items in a photo:\n${itemsText}\n\nCan you guess where I took this photo? Use the Location Guessing Game to find out!`;
     
+    console.log('Share text:', shareText);
+    console.log('Navigator.share available:', !!navigator.share);
+    
     if (navigator.share) {
         try {
+            console.log('Attempting native share...');
             await navigator.share({
                 title: 'Location Guessing Game',
                 text: shareText,
                 url: window.location.href
             });
+            console.log('Share successful');
             showStatus('Items shared successfully!', 'success');
         } catch (error) {
             console.log('Share cancelled or failed:', error);
+            showStatus('Share cancelled, copying to clipboard instead...', 'loading');
             // Fallback to copy
-            copyItems();
+            setTimeout(() => copyItems(), 1000);
         }
     } else {
-        // Fallback to copy
-        copyItems();
+        console.log('Native share not available, using copy fallback');
+        showStatus('Native sharing not available, copying to clipboard...', 'loading');
+        setTimeout(() => copyItems(), 1000);
     }
 }
 
 // Copy items to clipboard
 async function copyItems() {
+    console.log('Copy items function called');
+    
+    if (!gameState.detectedItems || gameState.detectedItems.length === 0) {
+        showStatus('No items to copy! Take a photo first.', 'error');
+        return;
+    }
+    
     const itemsText = gameState.detectedItems.join(', ');
     const shareText = `🎯 Location Guessing Game!\n\nI found these items in a photo:\n${itemsText}\n\nCan you guess where I took this photo? Use the Location Guessing Game to find out!`;
     
+    console.log('Attempting to copy:', shareText);
+    
     try {
-        await navigator.clipboard.writeText(shareText);
-        showStatus('Items copied to clipboard!', 'success');
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            console.log('Using modern clipboard API');
+            await navigator.clipboard.writeText(shareText);
+            showStatus('Items copied to clipboard!', 'success');
+        } else {
+            throw new Error('Clipboard API not available');
+        }
     } catch (error) {
-        console.error('Failed to copy:', error);
+        console.error('Modern clipboard failed, using fallback:', error);
         // Fallback for older browsers
-        const textArea = document.createElement('textarea');
-        textArea.value = shareText;
-        document.body.appendChild(textArea);
-        textArea.select();
-        document.execCommand('copy');
-        document.body.removeChild(textArea);
-        showStatus('Items copied to clipboard!', 'success');
+        try {
+            const textArea = document.createElement('textarea');
+            textArea.value = shareText;
+            textArea.style.position = 'fixed';
+            textArea.style.left = '-999999px';
+            textArea.style.top = '-999999px';
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            
+            const successful = document.execCommand('copy');
+            document.body.removeChild(textArea);
+            
+            if (successful) {
+                showStatus('Items copied to clipboard!', 'success');
+            } else {
+                throw new Error('execCommand failed');
+            }
+        } catch (fallbackError) {
+            console.error('All copy methods failed:', fallbackError);
+            showStatus('Failed to copy. Please manually copy the items: ' + itemsText, 'error');
+        }
+    }
+}
+
+// Show manual sharing interface
+function showManualShare() {
+    if (!gameState.detectedItems || gameState.detectedItems.length === 0) {
+        showStatus('No items to share! Take a photo first.', 'error');
+        return;
+    }
+    
+    const itemsText = gameState.detectedItems.join(', ');
+    const shareText = `🎯 Location Guessing Game!
+
+I found these items in a photo:
+${itemsText}
+
+Can you guess where I took this photo? Use the Location Guessing Game to find out!`;
+    
+    document.getElementById('shareText').value = shareText;
+    document.getElementById('manualShare').style.display = 'block';
+}
+
+// Hide manual sharing interface
+function hideManualShare() {
+    document.getElementById('manualShare').style.display = 'none';
+}
+
+// Copy manual text
+function copyManualText() {
+    const textarea = document.getElementById('shareText');
+    textarea.select();
+    textarea.setSelectionRange(0, 99999); // For mobile devices
+    
+    try {
+        const successful = document.execCommand('copy');
+        if (successful) {
+            showStatus('Text copied to clipboard!', 'success');
+        } else {
+            showStatus('Failed to copy. Please select and copy manually.', 'error');
+        }
+    } catch (err) {
+        showStatus('Failed to copy. Please select and copy manually.', 'error');
     }
 }
 
 // Generate QR code for sharing
 function generateQR() {
+    if (!gameState.detectedItems || gameState.detectedItems.length === 0) {
+        showStatus('No items to share! Take a photo first.', 'error');
+        return;
+    }
+    
     const itemsText = gameState.detectedItems.join(',');
     const qrData = JSON.stringify({
         type: 'location-guessing-game',
@@ -363,8 +454,31 @@ function showStatus(message, type = '') {
     }, 3000);
 }
 
+// Test function to verify sharing works
+function testSharing() {
+    console.log('Testing sharing functionality...');
+    console.log('Navigator.share available:', !!navigator.share);
+    console.log('Navigator.clipboard available:', !!navigator.clipboard);
+    console.log('Current detected items:', gameState.detectedItems);
+    
+    // Test with dummy data
+    const testItems = ['car', 'tree', 'person'];
+    const originalItems = gameState.detectedItems;
+    gameState.detectedItems = testItems;
+    
+    console.log('Testing with dummy items:', testItems);
+    shareItems();
+    
+    // Restore original items
+    gameState.detectedItems = originalItems;
+}
+
 // Initialize the game when page loads
 window.addEventListener('load', function() {
     initGame();
     checkForSharedData();
+    
+    // Add test function to window for debugging
+    window.testSharing = testSharing;
+    console.log('Test function available: window.testSharing()');
 });
