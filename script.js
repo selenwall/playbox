@@ -236,6 +236,119 @@ function goBackToPhoto() {
     locationStatus.className = 'status';
 }
 
+// Share items using Web Share API
+async function shareItems() {
+    const itemsText = gameState.detectedItems.join(', ');
+    const shareText = `🎯 Location Guessing Game!\n\nI found these items in a photo:\n${itemsText}\n\nCan you guess where I took this photo? Use the Location Guessing Game to find out!`;
+    
+    if (navigator.share) {
+        try {
+            await navigator.share({
+                title: 'Location Guessing Game',
+                text: shareText,
+                url: window.location.href
+            });
+            showStatus('Items shared successfully!', 'success');
+        } catch (error) {
+            console.log('Share cancelled or failed:', error);
+            // Fallback to copy
+            copyItems();
+        }
+    } else {
+        // Fallback to copy
+        copyItems();
+    }
+}
+
+// Copy items to clipboard
+async function copyItems() {
+    const itemsText = gameState.detectedItems.join(', ');
+    const shareText = `🎯 Location Guessing Game!\n\nI found these items in a photo:\n${itemsText}\n\nCan you guess where I took this photo? Use the Location Guessing Game to find out!`;
+    
+    try {
+        await navigator.clipboard.writeText(shareText);
+        showStatus('Items copied to clipboard!', 'success');
+    } catch (error) {
+        console.error('Failed to copy:', error);
+        // Fallback for older browsers
+        const textArea = document.createElement('textarea');
+        textArea.value = shareText;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+        showStatus('Items copied to clipboard!', 'success');
+    }
+}
+
+// Generate QR code for sharing
+function generateQR() {
+    const itemsText = gameState.detectedItems.join(',');
+    const qrData = JSON.stringify({
+        type: 'location-guessing-game',
+        items: gameState.detectedItems,
+        timestamp: Date.now()
+    });
+    
+    const qrContainer = document.getElementById('qrCode');
+    const qrDiv = document.getElementById('qrcode');
+    
+    // Clear previous QR code
+    qrDiv.innerHTML = '';
+    
+    // Generate QR code
+    QRCode.toCanvas(qrDiv, qrData, {
+        width: 200,
+        height: 200,
+        color: {
+            dark: '#000000',
+            light: '#FFFFFF'
+        }
+    }, function (error) {
+        if (error) {
+            console.error('QR code generation failed:', error);
+            showStatus('Failed to generate QR code', 'error');
+        } else {
+            qrContainer.style.display = 'block';
+            showStatus('QR code generated!', 'success');
+        }
+    });
+}
+
+// Parse shared data from URL or QR code
+function parseSharedData(data) {
+    try {
+        const parsed = JSON.parse(data);
+        if (parsed.type === 'location-guessing-game' && parsed.items) {
+            return parsed.items;
+        }
+    } catch (error) {
+        // Try parsing as comma-separated items
+        if (typeof data === 'string' && data.includes(',')) {
+            return data.split(',').map(item => item.trim());
+        }
+    }
+    return null;
+}
+
+// Check for shared data in URL parameters
+function checkForSharedData() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const sharedData = urlParams.get('items');
+    
+    if (sharedData) {
+        const items = parseSharedData(sharedData);
+        if (items && items.length > 0) {
+            gameState.detectedItems = items;
+            showStatus('Items loaded from shared data!', 'success');
+            // Auto-start guessing mode
+            setTimeout(() => {
+                startGuessing();
+            }, 2000);
+        }
+    }
+}
+
 // Show status message
 function showStatus(message, type = '') {
     const status = document.createElement('div');
@@ -251,4 +364,7 @@ function showStatus(message, type = '') {
 }
 
 // Initialize the game when page loads
-window.addEventListener('load', initGame);
+window.addEventListener('load', function() {
+    initGame();
+    checkForSharedData();
+});

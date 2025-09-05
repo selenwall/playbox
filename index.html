@@ -33,6 +33,21 @@
                 <p>📍 Location recorded!</p>
                 <p>Share these items with another player to guess the location.</p>
             </div>
+            <div class="sharing-options">
+                <button class="btn share-btn" id="shareBtn" onclick="shareItems()">
+                    📤 Share Items
+                </button>
+                <button class="btn secondary" onclick="copyItems()">
+                    📋 Copy Items
+                </button>
+                <button class="btn" onclick="generateQR()">
+                    📱 Generate QR Code
+                </button>
+            </div>
+            <div id="qrCode" class="qr-container" style="display: none;">
+                <div id="qrcode"></div>
+                <p>Scan this QR code to get the items!</p>
+            </div>
             <button class="btn" onclick="startGuessing()">Start Guessing Mode</button>
         </div>
 
@@ -53,6 +68,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.10.0/dist/tf.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd@2.2.2/dist/coco-ssd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
