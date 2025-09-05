@@ -186,6 +186,43 @@ h2 {
     color: #4CAF50;
 }
 
+.pixelated-photo-container {
+    background: rgba(255,255,255,0.1);
+    border-radius: 15px;
+    padding: 20px;
+    margin: 20px 0;
+    backdrop-filter: blur(10px);
+    text-align: center;
+}
+
+.pixelated-photo-container h3 {
+    margin-bottom: 15px;
+    font-size: 1.2rem;
+}
+
+.pixelated-photo-wrapper {
+    position: relative;
+    display: inline-block;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+
+.pixelated-photo {
+    width: 100%;
+    max-width: 300px;
+    height: 200px;
+    object-fit: cover;
+    image-rendering: pixelated;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: crisp-edges;
+    filter: blur(2px) contrast(1.2) saturate(0.8);
+    transform: scale(0.5);
+    transform-origin: top left;
+    width: 200%;
+    height: 200%;
+}
+
 .status {
     font-size: 1.1rem;
     margin: 15px 0;

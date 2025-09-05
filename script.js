@@ -5,7 +5,8 @@ let gameState = {
     photoLocation: null,
     currentLocation: null,
     score: 0,
-    model: null
+    model: null,
+    capturedPhotoData: null // Store the captured photo as data URL
 };
 
 // DOM elements
@@ -69,6 +70,9 @@ captureBtn.addEventListener('click', async function() {
         canvas.height = camera.videoHeight;
         context.drawImage(camera, 0, 0);
         
+        // Store the captured photo as data URL
+        gameState.capturedPhotoData = canvas.toDataURL('image/jpeg', 0.8);
+        
         // Get current location
         const position = await getCurrentPosition();
         gameState.photoLocation = {
@@ -124,6 +128,15 @@ function showItemsScreen() {
 function startGuessing() {
     document.getElementById('itemsScreen').classList.remove('active');
     document.getElementById('guessingScreen').classList.add('active');
+    
+    // Display pixelated photo if available
+    const pixelatedPhoto = document.getElementById('pixelatedPhoto');
+    if (gameState.capturedPhotoData) {
+        pixelatedPhoto.src = gameState.capturedPhotoData;
+        pixelatedPhoto.style.display = 'block';
+    } else {
+        pixelatedPhoto.style.display = 'none';
+    }
     
     // Display items for guessing
     guessingItemsList.innerHTML = '';
@@ -229,6 +242,7 @@ function goBackToPhoto() {
     gameState.photoLocation = null;
     gameState.currentLocation = null;
     gameState.score = 0;
+    gameState.capturedPhotoData = null;
     
     // Reset UI
     captureBtn.disabled = false;
@@ -388,6 +402,9 @@ function checkForChallengeData() {
                 latitude: parsed.lat,
                 longitude: parsed.lng
             };
+            
+            // For shared challenges, we don't have the original photo
+            gameState.capturedPhotoData = null;
             
             showStatus(`Challenge loaded! Find items: ${parsed.items.join(', ')}`, 'success');
             
