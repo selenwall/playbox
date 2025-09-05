@@ -189,7 +189,7 @@ function startGuessing() {
     
     if (gameState.capturedPhotoData) {
         console.log('Setting pixelated photo:', gameState.capturedPhotoData.substring(0, 50) + '...');
-        // Add data URL prefix back for display
+        // Add data URL prefix back for display if needed
         const fullDataUrl = gameState.capturedPhotoData.startsWith('data:') 
             ? gameState.capturedPhotoData 
             : 'data:image/jpeg;base64,' + gameState.capturedPhotoData;
@@ -477,9 +477,13 @@ function parseChallengeData(encodedData) {
                 photo: decodedData.photo || null, // Include photo data if available
                 timestamp: decodedData.t || decodedData.timestamp || Date.now() // Handle both formats
             };
+        } else {
+            console.error('Invalid challenge data structure:', decodedData);
+            console.error('Missing required fields - items:', !!decodedData.items, 'lat:', !!decodedData.lat, 'lng:', !!decodedData.lng);
         }
     } catch (error) {
         console.error('Failed to parse challenge data:', error);
+        console.error('Raw encoded data:', encodedData.substring(0, 100) + '...');
     }
     return null;
 }
