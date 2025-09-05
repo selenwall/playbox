@@ -259,8 +259,11 @@ function generateShareLink() {
     // Encode data as base64
     const encodedData = btoa(JSON.stringify(shareData));
     
-    // Create shareable URL
-    const baseUrl = window.location.origin + window.location.pathname;
+    // Create shareable URL (use GitHub Pages URL in production)
+    const isProduction = window.location.hostname === 'selenwall.github.io';
+    const baseUrl = isProduction 
+        ? 'https://selenwall.github.io/playbox'
+        : window.location.origin + window.location.pathname;
     const shareUrl = `${baseUrl}?challenge=${encodedData}`;
     
     return shareUrl;
