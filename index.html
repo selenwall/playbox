@@ -40,9 +40,19 @@
                 <button class="btn secondary" onclick="copyItems()">
                     📋 Copy Items
                 </button>
+                <button class="btn" onclick="showManualShare()">
+                    📝 Manual Share
+                </button>
                 <button class="btn" onclick="generateQR()">
                     📱 Generate QR Code
                 </button>
+            </div>
+            <div id="manualShare" class="manual-share-container" style="display: none;">
+                <h3>Manual Sharing</h3>
+                <p>Copy this text and send it via any messaging app:</p>
+                <textarea id="shareText" readonly></textarea>
+                <button class="btn secondary" onclick="copyManualText()">Copy Text</button>
+                <button class="btn" onclick="hideManualShare()">Close</button>
             </div>
             <div id="qrCode" class="qr-container" style="display: none;">
                 <div id="qrcode"></div>
