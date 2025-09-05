@@ -95,14 +95,28 @@ captureBtn.addEventListener('click', async function() {
         captureBtn.disabled = true;
         showStatus('Capturing photo...', 'loading');
         
-        // Capture photo
+        // Capture photo at much smaller size for URL sharing
         const context = canvas.getContext('2d');
-        canvas.width = camera.videoWidth;
-        canvas.height = camera.videoHeight;
-        context.drawImage(camera, 0, 0);
         
-        // Store the captured photo as data URL
-        gameState.capturedPhotoData = canvas.toDataURL('image/jpeg', 0.8);
+        // Set canvas to small size (max 200x150 for pixelated effect)
+        const maxWidth = 200;
+        const maxHeight = 150;
+        const aspectRatio = camera.videoWidth / camera.videoHeight;
+        
+        if (aspectRatio > maxWidth / maxHeight) {
+            canvas.width = maxWidth;
+            canvas.height = maxWidth / aspectRatio;
+        } else {
+            canvas.height = maxHeight;
+            canvas.width = maxHeight * aspectRatio;
+        }
+        
+        context.drawImage(camera, 0, 0, canvas.width, canvas.height);
+        
+        // Store the captured photo as data URL with very low quality for small size
+        const fullDataUrl = canvas.toDataURL('image/jpeg', 0.3);
+        // Remove the data URL prefix to save space in the encoded data
+        gameState.capturedPhotoData = fullDataUrl.replace('data:image/jpeg;base64,', '');
         
         // Get current location
         const position = await getCurrentPosition();
@@ -175,7 +189,11 @@ function startGuessing() {
     
     if (gameState.capturedPhotoData) {
         console.log('Setting pixelated photo:', gameState.capturedPhotoData.substring(0, 50) + '...');
-        pixelatedPhoto.src = gameState.capturedPhotoData;
+        // Add data URL prefix back for display
+        const fullDataUrl = gameState.capturedPhotoData.startsWith('data:') 
+            ? gameState.capturedPhotoData 
+            : 'data:image/jpeg;base64,' + gameState.capturedPhotoData;
+        pixelatedPhoto.src = fullDataUrl;
         pixelatedPhoto.style.display = 'block';
         noPhotoMessage.style.display = 'none';
     } else {
@@ -343,10 +361,10 @@ function generateShareLink() {
     // Create data object with items, location, and photo
     const shareData = {
         items: gameState.detectedItems,
-        lat: gameState.photoLocation.latitude,
-        lng: gameState.photoLocation.longitude,
+        lat: Math.round(gameState.photoLocation.latitude * 1000000) / 1000000, // Round to 6 decimal places
+        lng: Math.round(gameState.photoLocation.longitude * 1000000) / 1000000, // Round to 6 decimal places
         photo: gameState.capturedPhotoData, // Include the photo data
-        timestamp: Date.now()
+        t: Math.floor(Date.now() / 1000) // Shorter timestamp (seconds instead of milliseconds)
     };
     
     // Encode data as base64
@@ -457,7 +475,7 @@ function parseChallengeData(encodedData) {
                 lat: decodedData.lat,
                 lng: decodedData.lng,
                 photo: decodedData.photo || null, // Include photo data if available
-                timestamp: decodedData.timestamp
+                timestamp: decodedData.t || decodedData.timestamp || Date.now() // Handle both formats
             };
         }
     } catch (error) {
