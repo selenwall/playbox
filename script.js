@@ -115,8 +115,8 @@ captureBtn.addEventListener('click', async function() {
         
         // Store the captured photo as data URL with very low quality for small size
         const fullDataUrl = canvas.toDataURL('image/jpeg', 0.3);
-        // Remove the data URL prefix to save space in the encoded data
-        gameState.capturedPhotoData = fullDataUrl.replace('data:image/jpeg;base64,', '');
+        // Store the full data URL for now (we'll optimize this later)
+        gameState.capturedPhotoData = fullDataUrl;
         
         // Get current location
         const position = await getCurrentPosition();
@@ -189,11 +189,8 @@ function startGuessing() {
     
     if (gameState.capturedPhotoData) {
         console.log('Setting pixelated photo:', gameState.capturedPhotoData.substring(0, 50) + '...');
-        // Add data URL prefix back for display if needed
-        const fullDataUrl = gameState.capturedPhotoData.startsWith('data:') 
-            ? gameState.capturedPhotoData 
-            : 'data:image/jpeg;base64,' + gameState.capturedPhotoData;
-        pixelatedPhoto.src = fullDataUrl;
+        // Use the photo data directly (it should already be a proper data URL)
+        pixelatedPhoto.src = gameState.capturedPhotoData;
         pixelatedPhoto.style.display = 'block';
         noPhotoMessage.style.display = 'none';
     } else {
