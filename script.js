@@ -166,6 +166,9 @@ function startGuessing() {
     // Update game state
     gameState.mode = 'guessing';
     
+    // Show mode indicator
+    showModeIndicator('guessing');
+    
     // Display pixelated photo if available
     const pixelatedPhoto = document.getElementById('pixelatedPhoto');
     const noPhotoMessage = document.getElementById('noPhotoMessage');
@@ -312,6 +315,9 @@ function goBackToPhoto() {
     gameState.score = 0;
     gameState.capturedPhotoData = null;
     
+    // Show mode indicator
+    showModeIndicator('photo');
+    
     // Restart camera for photo mode
     startCamera();
     
@@ -334,11 +340,12 @@ function generateShareLink() {
         return null;
     }
     
-    // Create data object with items and location
+    // Create data object with items, location, and photo
     const shareData = {
         items: gameState.detectedItems,
         lat: gameState.photoLocation.latitude,
         lng: gameState.photoLocation.longitude,
+        photo: gameState.capturedPhotoData, // Include the photo data
         timestamp: Date.now()
     };
     
@@ -449,6 +456,7 @@ function parseChallengeData(encodedData) {
                 items: decodedData.items,
                 lat: decodedData.lat,
                 lng: decodedData.lng,
+                photo: decodedData.photo || null, // Include photo data if available
                 timestamp: decodedData.timestamp
             };
         }
@@ -475,8 +483,8 @@ function checkForChallengeData() {
                 longitude: parsed.lng
             };
             
-            // For shared challenges, we don't have the original photo
-            gameState.capturedPhotoData = null;
+            // Set photo data if available
+            gameState.capturedPhotoData = parsed.photo || null;
             
             showStatus(`Challenge loaded! Find items: ${parsed.items.join(', ')}`, 'success');
             
@@ -487,6 +495,20 @@ function checkForChallengeData() {
         } else {
             showStatus('Invalid challenge data!', 'error');
         }
+    }
+}
+
+// Show mode indicator
+function showModeIndicator(mode) {
+    // Hide all mode indicators
+    document.querySelectorAll('.mode-indicator').forEach(indicator => {
+        indicator.classList.remove('active');
+    });
+    
+    // Show the active mode indicator
+    const activeIndicator = document.querySelector(`.mode-${mode}`);
+    if (activeIndicator) {
+        activeIndicator.classList.add('active');
     }
 }
 
@@ -527,6 +549,9 @@ function testSharing() {
 window.addEventListener('load', function() {
     initGame();
     checkForChallengeData();
+    
+    // Show initial mode indicator
+    showModeIndicator('photo');
     
     // Add test function to window for debugging
     window.testSharing = testSharing;
