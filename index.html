@@ -35,28 +35,17 @@
             </div>
             <div class="sharing-options">
                 <button class="btn share-btn" id="shareBtn" onclick="shareItems()">
-                    📤 Share Items
+                    📤 Share Challenge
                 </button>
-                <button class="btn secondary" onclick="copyItems()">
-                    📋 Copy Items
-                </button>
-                <button class="btn" onclick="showManualShare()">
-                    📝 Manual Share
-                </button>
-                <button class="btn" onclick="generateQR()">
-                    📱 Generate QR Code
+                <button class="btn secondary" onclick="copyShareLink()">
+                    📋 Copy Link
                 </button>
             </div>
-            <div id="manualShare" class="manual-share-container" style="display: none;">
-                <h3>Manual Sharing</h3>
-                <p>Copy this text and send it via any messaging app:</p>
-                <textarea id="shareText" readonly></textarea>
-                <button class="btn secondary" onclick="copyManualText()">Copy Text</button>
-                <button class="btn" onclick="hideManualShare()">Close</button>
-            </div>
-            <div id="qrCode" class="qr-container" style="display: none;">
-                <div id="qrcode"></div>
-                <p>Scan this QR code to get the items!</p>
+            <div id="shareLink" class="share-link-container" style="display: none;">
+                <h3>Share this link:</h3>
+                <input type="text" id="shareUrl" readonly>
+                <button class="btn secondary" onclick="copyShareUrl()">Copy Link</button>
+                <button class="btn" onclick="hideShareLink()">Close</button>
             </div>
             <button class="btn" onclick="startGuessing()">Start Guessing Mode</button>
         </div>
@@ -78,7 +67,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.10.0/dist/tf.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd@2.2.2/dist/coco-ssd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
