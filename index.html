@@ -12,6 +12,7 @@
         
         <div id="photoScreen" class="game-screen active">
             <h2>📸 Take a Photo</h2>
+            <div class="mode-indicator mode-photo">Mode 1: Photo Taking</div>
             <div class="camera-container">
                 <video id="camera" autoplay muted></video>
                 <canvas id="canvas" style="display: none;"></canvas>
@@ -52,6 +53,7 @@
 
         <div id="guessingScreen" class="game-screen">
             <h2>🎯 Guess the Location</h2>
+            <div class="mode-indicator mode-guessing">Mode 2: Location Searching</div>
             <div class="pixelated-photo-container">
                 <h3>📸 Original Photo (Pixelated)</h3>
                 <div class="pixelated-photo-wrapper">
@@ -67,7 +69,7 @@
                 <div class="score" id="scoreDisplay">Score: 0</div>
                 <div class="status" id="locationStatus">Move around to find the location!</div>
             </div>
-            <button class="btn secondary" onclick="goBackToPhoto()">Take New Photo</button>
+            <button class="btn secondary" onclick="goBackToPhoto()">🏃‍♂️ Give Up & Take New Photo</button>
         </div>
     </div>
 

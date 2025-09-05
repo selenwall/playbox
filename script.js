@@ -6,7 +6,8 @@ let gameState = {
     currentLocation: null,
     score: 0,
     model: null,
-    capturedPhotoData: null // Store the captured photo as data URL
+    capturedPhotoData: null, // Store the captured photo as data URL
+    locationWatchId: null // Store location tracking watch ID
 };
 
 // DOM elements
@@ -47,9 +48,39 @@ async function initCamera() {
         });
         camera.srcObject = stream;
         captureBtn.disabled = false;
+        console.log('Camera initialized for photo mode');
     } catch (error) {
         console.error('Error accessing camera:', error);
         showStatus('Camera access denied. Please allow camera access and refresh.', 'error');
+    }
+}
+
+// Stop camera
+function stopCamera() {
+    if (camera.srcObject) {
+        const tracks = camera.srcObject.getTracks();
+        tracks.forEach(track => track.stop());
+        camera.srcObject = null;
+        console.log('Camera stopped');
+    }
+}
+
+// Start camera
+async function startCamera() {
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({ 
+            video: { 
+                facingMode: 'environment',
+                width: { ideal: 640 },
+                height: { ideal: 480 }
+            } 
+        });
+        camera.srcObject = stream;
+        captureBtn.disabled = false;
+        console.log('Camera started for photo mode');
+    } catch (error) {
+        console.error('Error starting camera:', error);
+        showStatus('Failed to start camera. Please try again.', 'error');
     }
 }
 
@@ -124,10 +155,16 @@ function showItemsScreen() {
     });
 }
 
-// Start guessing mode
+// Start guessing mode (Mode 2: Location Searching)
 function startGuessing() {
+    // Stop camera when entering searching mode
+    stopCamera();
+    
     document.getElementById('itemsScreen').classList.remove('active');
     document.getElementById('guessingScreen').classList.add('active');
+    
+    // Update game state
+    gameState.mode = 'guessing';
     
     // Display pixelated photo if available
     const pixelatedPhoto = document.getElementById('pixelatedPhoto');
@@ -149,6 +186,8 @@ function startGuessing() {
     
     // Start location tracking
     startLocationTracking();
+    
+    console.log('Switched to Mode 2: Location Searching');
 }
 
 // Start location tracking for guessing
@@ -158,7 +197,7 @@ function startLocationTracking() {
         return;
     }
 
-    const watchId = navigator.geolocation.watchPosition(
+    gameState.locationWatchId = navigator.geolocation.watchPosition(
         function(position) {
             gameState.currentLocation = {
                 latitude: position.coords.latitude,
@@ -231,8 +270,14 @@ function getCurrentPosition() {
     });
 }
 
-// Go back to photo taking
+// Go back to photo taking (Mode 1: Photo Taking)
 function goBackToPhoto() {
+    // Stop any location tracking
+    if (gameState.locationWatchId) {
+        navigator.geolocation.clearWatch(gameState.locationWatchId);
+        gameState.locationWatchId = null;
+    }
+    
     document.getElementById('guessingScreen').classList.remove('active');
     document.getElementById('photoScreen').classList.add('active');
     
@@ -244,10 +289,14 @@ function goBackToPhoto() {
     gameState.score = 0;
     gameState.capturedPhotoData = null;
     
+    // Restart camera for photo mode
+    startCamera();
+    
     // Reset UI
-    captureBtn.disabled = false;
     locationStatus.textContent = 'Move around to find the location!';
     locationStatus.className = 'status';
+    
+    console.log('Switched to Mode 1: Photo Taking');
 }
 
 // Generate shareable link with encoded data
