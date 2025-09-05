@@ -150,7 +150,7 @@ h2 {
     background: #9C27B0;
 }
 
-.qr-container {
+.share-link-container {
     background: rgba(255,255,255,0.1);
     border-radius: 15px;
     padding: 20px;
@@ -159,34 +159,12 @@ h2 {
     text-align: center;
 }
 
-#qrcode {
-    margin: 15px auto;
-    display: inline-block;
-}
-
-.share-success {
-    background: rgba(76, 175, 80, 0.3);
-    border: 1px solid #4CAF50;
-    color: #4CAF50;
-}
-
-.manual-share-container {
-    background: rgba(255,255,255,0.1);
-    border-radius: 15px;
-    padding: 20px;
-    margin: 20px 0;
-    backdrop-filter: blur(10px);
-    text-align: left;
-}
-
-.manual-share-container h3 {
-    text-align: center;
+.share-link-container h3 {
     margin-bottom: 15px;
 }
 
-.manual-share-container textarea {
+.share-link-container input {
     width: 100%;
-    height: 120px;
     padding: 10px;
     border-radius: 8px;
     border: 1px solid rgba(255,255,255,0.3);
@@ -194,12 +172,18 @@ h2 {
     color: white;
     font-family: inherit;
     font-size: 14px;
-    resize: vertical;
     margin: 10px 0;
+    text-align: center;
 }
 
-.manual-share-container textarea::placeholder {
+.share-link-container input::placeholder {
     color: rgba(255,255,255,0.7);
+}
+
+.share-success {
+    background: rgba(76, 175, 80, 0.3);
+    border: 1px solid #4CAF50;
+    color: #4CAF50;
 }
 
 .status {

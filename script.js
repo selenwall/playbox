@@ -236,129 +236,111 @@ function goBackToPhoto() {
     locationStatus.className = 'status';
 }
 
-// Share items using Web Share API
-async function shareItems() {
-    console.log('Share items clicked');
-    console.log('Detected items:', gameState.detectedItems);
-    
+// Generate shareable link with encoded data
+function generateShareLink() {
     if (!gameState.detectedItems || gameState.detectedItems.length === 0) {
         showStatus('No items to share! Take a photo first.', 'error');
-        return;
+        return null;
     }
     
-    const itemsText = gameState.detectedItems.join(', ');
-    const shareText = `🎯 Location Guessing Game!\n\nI found these items in a photo:\n${itemsText}\n\nCan you guess where I took this photo? Use the Location Guessing Game to find out!`;
+    if (!gameState.photoLocation) {
+        showStatus('No location data! Take a photo first.', 'error');
+        return null;
+    }
     
-    console.log('Share text:', shareText);
+    // Create data object with items and location
+    const shareData = {
+        items: gameState.detectedItems,
+        lat: gameState.photoLocation.latitude,
+        lng: gameState.photoLocation.longitude,
+        timestamp: Date.now()
+    };
+    
+    // Encode data as base64
+    const encodedData = btoa(JSON.stringify(shareData));
+    
+    // Create shareable URL
+    const baseUrl = window.location.origin + window.location.pathname;
+    const shareUrl = `${baseUrl}?challenge=${encodedData}`;
+    
+    return shareUrl;
+}
+
+// Share items using Web Share API with generated link
+async function shareItems() {
+    console.log('Share items clicked');
+    
+    const shareUrl = generateShareLink();
+    if (!shareUrl) return;
+    
+    const shareText = `🎯 Location Guessing Game Challenge!\n\nI found these items in a photo: ${gameState.detectedItems.join(', ')}\n\nCan you guess where I took this photo? Click the link to play!`;
+    
+    console.log('Share URL:', shareUrl);
     console.log('Navigator.share available:', !!navigator.share);
     
     if (navigator.share) {
         try {
             console.log('Attempting native share...');
             await navigator.share({
-                title: 'Location Guessing Game',
+                title: 'Location Guessing Game Challenge',
                 text: shareText,
-                url: window.location.href
+                url: shareUrl
             });
             console.log('Share successful');
-            showStatus('Items shared successfully!', 'success');
+            showStatus('Challenge shared successfully!', 'success');
         } catch (error) {
             console.log('Share cancelled or failed:', error);
-            showStatus('Share cancelled, copying to clipboard instead...', 'loading');
-            // Fallback to copy
-            setTimeout(() => copyItems(), 1000);
+            showStatus('Share cancelled, showing link instead...', 'loading');
+            setTimeout(() => showShareLink(), 1000);
         }
     } else {
-        console.log('Native share not available, using copy fallback');
-        showStatus('Native sharing not available, copying to clipboard...', 'loading');
-        setTimeout(() => copyItems(), 1000);
+        console.log('Native share not available, showing link');
+        showShareLink();
     }
 }
 
-// Copy items to clipboard
-async function copyItems() {
-    console.log('Copy items function called');
+// Show share link interface
+function showShareLink() {
+    const shareUrl = generateShareLink();
+    if (!shareUrl) return;
     
-    if (!gameState.detectedItems || gameState.detectedItems.length === 0) {
-        showStatus('No items to copy! Take a photo first.', 'error');
-        return;
-    }
-    
-    const itemsText = gameState.detectedItems.join(', ');
-    const shareText = `🎯 Location Guessing Game!\n\nI found these items in a photo:\n${itemsText}\n\nCan you guess where I took this photo? Use the Location Guessing Game to find out!`;
-    
-    console.log('Attempting to copy:', shareText);
+    document.getElementById('shareUrl').value = shareUrl;
+    document.getElementById('shareLink').style.display = 'block';
+}
+
+// Hide share link interface
+function hideShareLink() {
+    document.getElementById('shareLink').style.display = 'none';
+}
+
+// Copy share link to clipboard
+async function copyShareLink() {
+    const shareUrl = generateShareLink();
+    if (!shareUrl) return;
     
     try {
         if (navigator.clipboard && navigator.clipboard.writeText) {
-            console.log('Using modern clipboard API');
-            await navigator.clipboard.writeText(shareText);
-            showStatus('Items copied to clipboard!', 'success');
+            await navigator.clipboard.writeText(shareUrl);
+            showStatus('Share link copied to clipboard!', 'success');
         } else {
             throw new Error('Clipboard API not available');
         }
     } catch (error) {
-        console.error('Modern clipboard failed, using fallback:', error);
-        // Fallback for older browsers
-        try {
-            const textArea = document.createElement('textarea');
-            textArea.value = shareText;
-            textArea.style.position = 'fixed';
-            textArea.style.left = '-999999px';
-            textArea.style.top = '-999999px';
-            document.body.appendChild(textArea);
-            textArea.focus();
-            textArea.select();
-            
-            const successful = document.execCommand('copy');
-            document.body.removeChild(textArea);
-            
-            if (successful) {
-                showStatus('Items copied to clipboard!', 'success');
-            } else {
-                throw new Error('execCommand failed');
-            }
-        } catch (fallbackError) {
-            console.error('All copy methods failed:', fallbackError);
-            showStatus('Failed to copy. Please manually copy the items: ' + itemsText, 'error');
-        }
+        console.error('Clipboard failed, showing link instead:', error);
+        showShareLink();
     }
 }
 
-// Show manual sharing interface
-function showManualShare() {
-    if (!gameState.detectedItems || gameState.detectedItems.length === 0) {
-        showStatus('No items to share! Take a photo first.', 'error');
-        return;
-    }
-    
-    const itemsText = gameState.detectedItems.join(', ');
-    const shareText = `🎯 Location Guessing Game!
-
-I found these items in a photo:
-${itemsText}
-
-Can you guess where I took this photo? Use the Location Guessing Game to find out!`;
-    
-    document.getElementById('shareText').value = shareText;
-    document.getElementById('manualShare').style.display = 'block';
-}
-
-// Hide manual sharing interface
-function hideManualShare() {
-    document.getElementById('manualShare').style.display = 'none';
-}
-
-// Copy manual text
-function copyManualText() {
-    const textarea = document.getElementById('shareText');
-    textarea.select();
-    textarea.setSelectionRange(0, 99999); // For mobile devices
+// Copy share URL from input
+function copyShareUrl() {
+    const shareUrlInput = document.getElementById('shareUrl');
+    shareUrlInput.select();
+    shareUrlInput.setSelectionRange(0, 99999); // For mobile devices
     
     try {
         const successful = document.execCommand('copy');
         if (successful) {
-            showStatus('Text copied to clipboard!', 'success');
+            showStatus('Link copied to clipboard!', 'success');
         } else {
             showStatus('Failed to copy. Please select and copy manually.', 'error');
         }
@@ -367,75 +349,51 @@ function copyManualText() {
     }
 }
 
-// Generate QR code for sharing
-function generateQR() {
-    if (!gameState.detectedItems || gameState.detectedItems.length === 0) {
-        showStatus('No items to share! Take a photo first.', 'error');
-        return;
-    }
-    
-    const itemsText = gameState.detectedItems.join(',');
-    const qrData = JSON.stringify({
-        type: 'location-guessing-game',
-        items: gameState.detectedItems,
-        timestamp: Date.now()
-    });
-    
-    const qrContainer = document.getElementById('qrCode');
-    const qrDiv = document.getElementById('qrcode');
-    
-    // Clear previous QR code
-    qrDiv.innerHTML = '';
-    
-    // Generate QR code
-    QRCode.toCanvas(qrDiv, qrData, {
-        width: 200,
-        height: 200,
-        color: {
-            dark: '#000000',
-            light: '#FFFFFF'
-        }
-    }, function (error) {
-        if (error) {
-            console.error('QR code generation failed:', error);
-            showStatus('Failed to generate QR code', 'error');
-        } else {
-            qrContainer.style.display = 'block';
-            showStatus('QR code generated!', 'success');
-        }
-    });
-}
-
-// Parse shared data from URL or QR code
-function parseSharedData(data) {
+// Parse challenge data from URL parameters
+function parseChallengeData(encodedData) {
     try {
-        const parsed = JSON.parse(data);
-        if (parsed.type === 'location-guessing-game' && parsed.items) {
-            return parsed.items;
+        const decodedData = JSON.parse(atob(encodedData));
+        console.log('Parsed challenge data:', decodedData);
+        
+        if (decodedData.items && decodedData.lat && decodedData.lng) {
+            return {
+                items: decodedData.items,
+                lat: decodedData.lat,
+                lng: decodedData.lng,
+                timestamp: decodedData.timestamp
+            };
         }
     } catch (error) {
-        // Try parsing as comma-separated items
-        if (typeof data === 'string' && data.includes(',')) {
-            return data.split(',').map(item => item.trim());
-        }
+        console.error('Failed to parse challenge data:', error);
     }
     return null;
 }
 
-// Check for shared data in URL parameters
-function checkForSharedData() {
+// Check for challenge data in URL parameters
+function checkForChallengeData() {
     const urlParams = new URLSearchParams(window.location.search);
-    const sharedData = urlParams.get('items');
+    const challengeData = urlParams.get('challenge');
     
-    if (sharedData) {
-        const items = parseSharedData(sharedData);
-        if (items && items.length > 0) {
-            gameState.detectedItems = items;
-            showStatus('Items loaded from shared data!', 'success');
+    if (challengeData) {
+        console.log('Found challenge data in URL');
+        const parsed = parseChallengeData(challengeData);
+        
+        if (parsed) {
+            // Set up the challenge
+            gameState.detectedItems = parsed.items;
+            gameState.photoLocation = {
+                latitude: parsed.lat,
+                longitude: parsed.lng
+            };
+            
+            showStatus(`Challenge loaded! Find items: ${parsed.items.join(', ')}`, 'success');
+            
             // Auto-start guessing mode
             setTimeout(() => {
                 startGuessing();
             }, 2000);
+        } else {
+            showStatus('Invalid challenge data!', 'error');
         }
     }
 }
@@ -476,7 +434,7 @@ function testSharing() {
 // Initialize the game when page loads
 window.addEventListener('load', function() {
     initGame();
-    checkForSharedData();
+    checkForChallengeData();
     
     // Add test function to window for debugging
     window.testSharing = testSharing;
