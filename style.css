@@ -228,8 +228,7 @@ h2 {
 }
 
 .pixelated-photo {
-    width: 100%;
-    max-width: 300px;
+    width: 300px;
     height: 200px;
     object-fit: cover;
     image-rendering: pixelated;
@@ -238,8 +237,27 @@ h2 {
     filter: blur(2px) contrast(1.2) saturate(0.8);
     transform: scale(0.5);
     transform-origin: top left;
-    width: 200%;
-    height: 200%;
+    display: block;
+}
+
+.no-photo-message {
+    width: 300px;
+    height: 200px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: rgba(255,255,255,0.1);
+    border: 2px dashed rgba(255,255,255,0.3);
+    border-radius: 10px;
+    color: rgba(255,255,255,0.7);
+    text-align: center;
+    padding: 20px;
+}
+
+.no-photo-message p {
+    margin: 5px 0;
+    font-size: 0.9rem;
 }
 
 .status {
