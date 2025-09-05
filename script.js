@@ -168,11 +168,17 @@ function startGuessing() {
     
     // Display pixelated photo if available
     const pixelatedPhoto = document.getElementById('pixelatedPhoto');
+    const noPhotoMessage = document.getElementById('noPhotoMessage');
+    
     if (gameState.capturedPhotoData) {
+        console.log('Setting pixelated photo:', gameState.capturedPhotoData.substring(0, 50) + '...');
         pixelatedPhoto.src = gameState.capturedPhotoData;
         pixelatedPhoto.style.display = 'block';
+        noPhotoMessage.style.display = 'none';
     } else {
+        console.log('No captured photo data available');
         pixelatedPhoto.style.display = 'none';
+        noPhotoMessage.style.display = 'flex';
     }
     
     // Display items for guessing
@@ -186,6 +192,9 @@ function startGuessing() {
     
     // Start location tracking
     startLocationTracking();
+    
+    // Update button text
+    updateGiveUpButton();
     
     console.log('Switched to Mode 2: Location Searching');
 }
@@ -236,10 +245,24 @@ function updateDistance() {
             gameState.score = 1;
             locationStatus.textContent = '🎉 Congratulations! You found the location!';
             locationStatus.className = 'status success';
+            updateGiveUpButton();
         }
     } else {
         locationStatus.textContent = 'Move around to find the location!';
         locationStatus.className = 'status';
+        updateGiveUpButton();
+    }
+}
+
+// Update the give up button text based on game state
+function updateGiveUpButton() {
+    const giveUpButton = document.querySelector('#guessingScreen .btn.secondary');
+    if (giveUpButton) {
+        if (gameState.score > 0) {
+            giveUpButton.textContent = '🏆 Take New Photo';
+        } else {
+            giveUpButton.textContent = '🏃‍♂️ Give Up & Take New Photo';
+        }
     }
 }
 
