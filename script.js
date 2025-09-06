@@ -7,6 +7,7 @@ let gameState = {
     score: 0,
     model: null,
     capturedPhotoData: null, // Store the captured photo as data URL
+    sharePhotoData: null, // Store a small version for sharing
     locationWatchId: null // Store location tracking watch ID
 };
 
@@ -112,8 +113,23 @@ captureBtn.addEventListener('click', async function() {
         // Store the captured photo as data URL with high quality
         // Quality 0.7 provides good balance for 1024px wide images
         const fullDataUrl = canvas.toDataURL('image/jpeg', 0.7);
-        // Store the full data URL for now (we'll optimize this later)
         gameState.capturedPhotoData = fullDataUrl;
+        
+        // Create a much smaller version for sharing (to avoid URL length limits)
+        const smallCanvas = document.createElement('canvas');
+        const smallContext = smallCanvas.getContext('2d');
+        
+        // Create a very small image for sharing (64x64 pixels)
+        const shareSize = 64;
+        smallCanvas.width = shareSize;
+        smallCanvas.height = shareSize;
+        
+        // Draw the image scaled down and pixelated
+        smallContext.imageSmoothingEnabled = false;
+        smallContext.drawImage(canvas, 0, 0, shareSize, shareSize);
+        
+        // Store the small version for sharing
+        gameState.sharePhotoData = smallCanvas.toDataURL('image/jpeg', 0.5);
         
         // Get current location
         const position = await getCurrentPosition();
@@ -357,7 +373,7 @@ function generateShareLink() {
         items: gameState.detectedItems,
         lat: Math.round(gameState.photoLocation.latitude * 1000000) / 1000000, // Round to 6 decimal places
         lng: Math.round(gameState.photoLocation.longitude * 1000000) / 1000000, // Round to 6 decimal places
-        photo: gameState.capturedPhotoData, // Include the photo data
+        photo: gameState.sharePhotoData, // Use the small version for sharing
         t: Math.floor(Date.now() / 1000) // Shorter timestamp (seconds instead of milliseconds)
     };
     
