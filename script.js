@@ -45,8 +45,8 @@ async function initCamera() {
         const stream = await navigator.mediaDevices.getUserMedia({ 
             video: { 
                 facingMode: 'environment',
-                width: { ideal: 640 },
-                height: { ideal: 480 }
+                width: { ideal: 1920, max: 3840 },
+                height: { ideal: 1080, max: 2160 }
             } 
         });
         camera.srcObject = stream;
@@ -74,8 +74,8 @@ async function startCamera() {
         const stream = await navigator.mediaDevices.getUserMedia({ 
             video: { 
                 facingMode: 'environment',
-                width: { ideal: 640 },
-                height: { ideal: 480 }
+                width: { ideal: 1920, max: 3840 },
+                height: { ideal: 1080, max: 2160 }
             } 
         });
         camera.srcObject = stream;
