@@ -98,25 +98,20 @@ captureBtn.addEventListener('click', async function() {
         // Capture photo at much smaller size for URL sharing
         const context = canvas.getContext('2d');
         
-        // Set canvas to small size optimized for mobile screens (~100 DPI)
-        // Target size: ~150x100 pixels for small screens
-        const maxWidth = 150;
-        const maxHeight = 100;
+        // Set canvas to high resolution for better quality
+        // Target size: 1024px wide, maintain aspect ratio
+        const targetWidth = 1024;
         const aspectRatio = camera.videoWidth / camera.videoHeight;
+        const targetHeight = Math.round(targetWidth / aspectRatio);
         
-        if (aspectRatio > maxWidth / maxHeight) {
-            canvas.width = maxWidth;
-            canvas.height = maxWidth / aspectRatio;
-        } else {
-            canvas.height = maxHeight;
-            canvas.width = maxHeight * aspectRatio;
-        }
+        canvas.width = targetWidth;
+        canvas.height = targetHeight;
         
         context.drawImage(camera, 0, 0, canvas.width, canvas.height);
         
-        // Store the captured photo as data URL optimized for small screens
-        // Quality 0.4 provides good balance for ~100 DPI mobile screens
-        const fullDataUrl = canvas.toDataURL('image/jpeg', 0.4);
+        // Store the captured photo as data URL with high quality
+        // Quality 0.7 provides good balance for 1024px wide images
+        const fullDataUrl = canvas.toDataURL('image/jpeg', 0.7);
         // Store the full data URL for now (we'll optimize this later)
         gameState.capturedPhotoData = fullDataUrl;
         
