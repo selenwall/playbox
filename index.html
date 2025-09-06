@@ -5,6 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Location Guessing Game</title>
     <link rel="stylesheet" href="style.css">
+    <script>
+        // Check for challenge data immediately to hide photo screen if needed
+        (function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const challengeData = urlParams.get('challenge');
+            if (challengeData) {
+                // Hide photo screen immediately if there's a challenge
+                document.addEventListener('DOMContentLoaded', function() {
+                    const photoScreen = document.getElementById('photoScreen');
+                    if (photoScreen) {
+                        photoScreen.classList.remove('active');
+                    }
+                });
+            }
+        })();
+    </script>
 </head>
 <body>
     <div class="container">
