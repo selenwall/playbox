@@ -474,10 +474,30 @@ function parseChallengeData(encodedData) {
         } else {
             console.error('Invalid challenge data structure:', decodedData);
             console.error('Missing required fields - items:', !!decodedData.items, 'lat:', !!decodedData.lat, 'lng:', !!decodedData.lng);
+            
+            // Try to handle old format with different field names
+            if (decodedData.detectedItems && decodedData.photoLocation) {
+                console.log('Attempting to parse old format data...');
+                return {
+                    items: decodedData.detectedItems,
+                    lat: decodedData.photoLocation.latitude,
+                    lng: decodedData.photoLocation.longitude,
+                    photo: decodedData.capturedPhotoData || null,
+                    timestamp: Date.now()
+                };
+            }
         }
     } catch (error) {
         console.error('Failed to parse challenge data:', error);
         console.error('Raw encoded data:', encodedData.substring(0, 100) + '...');
+        
+        // Try to decode as plain text (fallback)
+        try {
+            const plainText = atob(encodedData);
+            console.log('Decoded as plain text:', plainText.substring(0, 100) + '...');
+        } catch (e) {
+            console.error('Not valid base64 data either');
+        }
     }
     return null;
 }
@@ -489,9 +509,13 @@ function checkForChallengeData() {
     
     if (challengeData) {
         console.log('Found challenge data in URL');
+        console.log('Challenge data length:', challengeData.length);
+        console.log('First 100 chars:', challengeData.substring(0, 100));
+        
         const parsed = parseChallengeData(challengeData);
         
         if (parsed) {
+            console.log('Successfully parsed challenge data:', parsed);
             // Set up the challenge
             gameState.detectedItems = parsed.items;
             gameState.photoLocation = {
@@ -509,7 +533,8 @@ function checkForChallengeData() {
                 startGuessing();
             }, 2000);
         } else {
-            showStatus('Invalid challenge data!', 'error');
+            console.error('Failed to parse challenge data');
+            showStatus('Invalid challenge data - check console for details', 'error');
         }
     }
 }
