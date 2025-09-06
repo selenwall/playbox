@@ -50,11 +50,73 @@ async function initCamera() {
             } 
         });
         camera.srcObject = stream;
-        captureBtn.disabled = false;
+        captureBtn.disabled = true; // Disabled until GPS is accurate enough
         console.log('Camera initialized for photo mode');
+        
+        // Start monitoring GPS accuracy
+        startGPSMonitoring();
     } catch (error) {
         console.error('Error accessing camera:', error);
         showStatus('Kameraåtkomst nekad. Vänligen tillåt kameraåtkomst och ladda om.', 'error');
+    }
+}
+
+// Start GPS monitoring for photo mode
+function startGPSMonitoring() {
+    if (!navigator.geolocation) {
+        updateGPSStatus('GPS stöds inte', 'error');
+        return;
+    }
+    
+    navigator.geolocation.watchPosition(
+        function(position) {
+            const accuracy = position.coords.accuracy;
+            const accuracyDisplay = document.getElementById('gpsAccuracy');
+            const statusText = document.getElementById('gpsStatusText');
+            
+            if (accuracyDisplay) {
+                accuracyDisplay.textContent = `GPS-noggrannhet: ±${Math.round(accuracy)}m`;
+            }
+            
+            if (accuracy <= 7) {
+                // GPS is accurate enough
+                captureBtn.disabled = false;
+                if (statusText) {
+                    statusText.textContent = '✅ GPS-noggrannhet OK - Du kan ta foto!';
+                    statusText.style.color = '#4CAF50';
+                }
+                if (accuracyDisplay) {
+                    accuracyDisplay.style.color = '#4CAF50';
+                }
+            } else {
+                // GPS not accurate enough
+                captureBtn.disabled = true;
+                if (statusText) {
+                    statusText.textContent = `❌ GPS-noggrannhet för dålig. Behöver <7m (nu: ±${Math.round(accuracy)}m)`;
+                    statusText.style.color = '#f44336';
+                }
+                if (accuracyDisplay) {
+                    accuracyDisplay.style.color = '#f44336';
+                }
+            }
+        },
+        function(error) {
+            updateGPSStatus('GPS-fel: ' + error.message, 'error');
+        },
+        {
+            enableHighAccuracy: true,
+            timeout: 30000,
+            maximumAge: 1000
+        }
+    );
+}
+
+// Update GPS status display
+function updateGPSStatus(message, type) {
+    const statusText = document.getElementById('gpsStatusText');
+    if (statusText) {
+        statusText.textContent = message;
+        statusText.style.color = type === 'error' ? '#f44336' : '#4CAF50';
     }
 }
 
@@ -133,12 +195,24 @@ captureBtn.addEventListener('click', async function() {
         // Store the small version for sharing
         gameState.sharePhotoData = smallCanvas.toDataURL('image/jpeg', 0.5);
         
-        // Get current location
+        // Get current location with accuracy check
         const position = await getCurrentPosition();
+        
+        // Check GPS accuracy before allowing photo capture
+        if (position.coords.accuracy > 7) {
+            showStatus(`GPS-noggrannhet för dålig: ±${Math.round(position.coords.accuracy)}m. Behöver <7m för att ta foto.`, 'error');
+            captureBtn.disabled = false;
+            detectionLoading.style.display = 'none';
+            return;
+        }
+        
         gameState.photoLocation = {
             latitude: position.coords.latitude,
-            longitude: position.coords.longitude
+            longitude: position.coords.longitude,
+            accuracy: position.coords.accuracy
         };
+        
+        console.log(`Photo location accuracy: ±${Math.round(position.coords.accuracy)}m`);
         
         // Detect objects
         detectionLoading.style.display = 'block';
@@ -364,7 +438,7 @@ function getCurrentPosition() {
         }
         navigator.geolocation.getCurrentPosition(resolve, reject, {
             enableHighAccuracy: true,
-            timeout: 10000,
+            timeout: 30000,
             maximumAge: 0
         });
     });
