@@ -241,12 +241,46 @@ function startLocationTracking() {
         return;
     }
 
+    // First, try to get a high-accuracy position
+    navigator.geolocation.getCurrentPosition(
+        function(position) {
+            gameState.currentLocation = {
+                latitude: position.coords.latitude,
+                longitude: position.coords.longitude,
+                accuracy: position.coords.accuracy
+            };
+            
+            console.log(`Initial GPS Accuracy: ${position.coords.accuracy}m`);
+            updateDistance();
+            
+            // Then start watching for updates
+            startLocationWatching();
+        },
+        function(error) {
+            console.error('Initial geolocation error:', error);
+            showStatus('Platsåtkomst nekad. Vänligen aktivera platsjänster.', 'error');
+        },
+        {
+            enableHighAccuracy: true,
+            timeout: 30000,
+            maximumAge: 0
+        }
+    );
+}
+
+// Start watching position changes
+function startLocationWatching() {
     gameState.locationWatchId = navigator.geolocation.watchPosition(
         function(position) {
             gameState.currentLocation = {
                 latitude: position.coords.latitude,
-                longitude: position.coords.longitude
+                longitude: position.coords.longitude,
+                accuracy: position.coords.accuracy
             };
+            
+            // Log GPS accuracy for debugging
+            console.log(`GPS Accuracy: ${position.coords.accuracy}m`);
+            
             updateDistance();
         },
         function(error) {
@@ -255,8 +289,8 @@ function startLocationTracking() {
         },
         {
             enableHighAccuracy: true,
-            timeout: 10000,
-            maximumAge: 1000
+            timeout: 30000,
+            maximumAge: 5000 // Allow some caching for better performance
         }
     );
 }
@@ -274,8 +308,16 @@ function updateDistance() {
 
     distanceDisplay.textContent = `Avstånd: ${distance.toFixed(1)}m`;
     scoreDisplay.textContent = `Poäng: ${gameState.score}`;
+    
+    // Show GPS accuracy if available
+    if (gameState.currentLocation && gameState.currentLocation.accuracy) {
+        const accuracyDisplay = document.getElementById('accuracyDisplay');
+        if (accuracyDisplay) {
+            accuracyDisplay.textContent = `GPS noggrannhet: ±${Math.round(gameState.currentLocation.accuracy)}m`;
+        }
+    }
 
-    if (distance <= 10) {
+    if (distance <= 25) {
         if (gameState.score === 0) {
             gameState.score = 1;
             locationStatus.textContent = '🎉 Grattis! Du hittade platsen!';
