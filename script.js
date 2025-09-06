@@ -29,8 +29,10 @@ async function initGame() {
         gameState.model = await cocoSsd.load();
         showStatus('Model loaded! Ready to take photos.', 'success');
         
-        // Request camera access
-        await initCamera();
+        // Only initialize camera if we're not in guessing mode
+        if (gameState.mode !== 'guessing') {
+            await initCamera();
+        }
     } catch (error) {
         console.error('Error initializing game:', error);
         showStatus('Error loading game. Please refresh the page.', 'error');
@@ -187,6 +189,8 @@ function startGuessing() {
     // Stop camera when entering searching mode
     stopCamera();
     
+    // Hide all other screens and show guessing screen
+    document.getElementById('photoScreen').classList.remove('active');
     document.getElementById('itemsScreen').classList.remove('active');
     document.getElementById('guessingScreen').classList.add('active');
     
@@ -542,6 +546,9 @@ function checkForChallengeData() {
             // Set photo data if available
             gameState.capturedPhotoData = parsed.photo || null;
             
+            // Set mode to guessing to prevent camera initialization
+            gameState.mode = 'guessing';
+            
             showStatus(`Challenge loaded! Find items: ${parsed.items.join(', ')}`, 'success');
             
             // Auto-start guessing mode
@@ -604,11 +611,14 @@ function testSharing() {
 
 // Initialize the game when page loads
 window.addEventListener('load', function() {
-    initGame();
+    // Check for challenge data first to determine the mode
     checkForChallengeData();
     
-    // Show initial mode indicator
-    showModeIndicator('photo');
+    // Initialize the game (camera will only load if not in guessing mode)
+    initGame();
+    
+    // Show appropriate mode indicator
+    showModeIndicator(gameState.mode);
     
     // Add test function to window for debugging
     window.testSharing = testSharing;
