@@ -226,8 +226,8 @@ h2 {
 .pixelated-photo-wrapper {
     position: relative;
     display: inline-block;
-    width: 300px;
-    height: 200px;
+    width: 240px;
+    height: 160px;
     border-radius: 10px;
     overflow: hidden;
     box-shadow: 0 4px 15px rgba(0,0,0,0.3);
@@ -236,8 +236,8 @@ h2 {
 .pixelated-photo {
     width: 100%;
     height: 100%;
-    max-width: 300px;
-    max-height: 200px;
+    max-width: 240px;
+    max-height: 160px;
     object-fit: cover;
     image-rendering: pixelated;
     image-rendering: -moz-crisp-edges;
@@ -249,8 +249,8 @@ h2 {
 }
 
 .no-photo-message {
-    width: 300px;
-    height: 200px;
+    width: 240px;
+    height: 160px;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -322,8 +322,8 @@ h2 {
     
     .pixelated-photo-wrapper {
         width: 100%;
-        max-width: 280px;
-        height: 180px;
+        max-width: 200px;
+        height: 130px;
     }
     
     .pixelated-photo {
@@ -333,7 +333,12 @@ h2 {
     
     .no-photo-message {
         width: 100%;
-        max-width: 280px;
-        height: 180px;
+        max-width: 200px;
+        height: 130px;
+        padding: 15px;
+    }
+    
+    .no-photo-message p {
+        font-size: 0.8rem;
     }
 }
