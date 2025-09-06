@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="sv">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Location Guessing Game</title>
+    <title>Var?! - Platsgissningsspel</title>
     <link rel="stylesheet" href="style.css">
     <script>
         // Check for challenge data immediately to hide photo screen if needed
@@ -24,72 +24,72 @@
 </head>
 <body>
     <div class="container">
-        <h1>🎯 Location Guessing Game</h1>
+        <h1>🎯 Var?!</h1>
         
         <div id="photoScreen" class="game-screen active">
-            <h2>📸 Take a Photo</h2>
-            <div class="mode-indicator mode-photo">Mode 1: Photo Taking</div>
+            <h2>📸 Ta ett foto</h2>
+            <div class="mode-indicator mode-photo">Läge 1: Fototagning</div>
             <div class="camera-container">
                 <video id="camera" autoplay muted></video>
                 <canvas id="canvas" style="display: none;"></canvas>
             </div>
-            <button id="captureBtn">Capture Photo</button>
+            <button id="captureBtn">Ta foto</button>
             <div class="loading" id="detectionLoading">
                 <div class="spinner"></div>
-                <p>Detecting objects...</p>
+                <p>Upptäcker objekt...</p>
             </div>
         </div>
 
         <div id="itemsScreen" class="game-screen">
-            <h2>🔍 Detected Items</h2>
+            <h2>🔍 Upptäckta objekt</h2>
             <div class="items-display">
-                <p>Items found in the photo:</p>
+                <p>Objekt som hittades i fotot:</p>
                 <div id="itemsList" class="items-list"></div>
             </div>
             <div class="location-info">
-                <p>📍 Location recorded!</p>
-                <p>Share these items with another player to guess the location.</p>
+                <p>📍 Plats inspelad!</p>
+                <p>Dela dessa objekt med en annan spelare för att gissa platsen.</p>
             </div>
             <div class="sharing-options">
                 <button class="btn share-btn" id="shareBtn" onclick="shareItems()">
-                    📤 Share Challenge
+                    📤 Dela utmaning
                 </button>
                 <button class="btn secondary" onclick="copyShareLink()">
-                    📋 Copy Link
+                    📋 Kopiera länk
                 </button>
             </div>
             <div id="shareLink" class="share-link-container" style="display: none;">
-                <h3>Share this link:</h3>
+                <h3>Dela denna länk:</h3>
                 <input type="text" id="shareUrl" readonly>
-                <button class="btn secondary" onclick="copyShareUrl()">Copy Link</button>
-                <button class="btn" onclick="hideShareLink()">Close</button>
+                <button class="btn secondary" onclick="copyShareUrl()">Kopiera länk</button>
+                <button class="btn" onclick="hideShareLink()">Stäng</button>
             </div>
-            <button class="btn" onclick="startGuessing()">Start Guessing Mode</button>
+            <button class="btn" onclick="startGuessing()">Starta gissningsläge</button>
         </div>
 
         <div id="guessingScreen" class="game-screen">
-            <h2>🎯 Guess the Location</h2>
-            <div class="mode-indicator mode-guessing">Mode 2: Location Searching</div>
+            <h2>🎯 Gissa platsen</h2>
+            <div class="mode-indicator mode-guessing">Läge 2: Platsökning</div>
             <div class="pixelated-photo-container">
-                <h3>📸 Original Photo (Pixelated)</h3>
+                <h3>📸 Originalfoto (pixlat)</h3>
                 <div class="pixelated-photo-wrapper">
                     <img id="pixelatedPhoto" src="" alt="Pixelated photo" class="pixelated-photo" style="display: none;">
                     <div id="noPhotoMessage" class="no-photo-message" style="display: none;">
-                        <p>📷 No original photo available</p>
-                        <p>This is a shared challenge</p>
+                        <p>📷 Inget originalfoto tillgängligt</p>
+                        <p>Detta är en delad utmaning</p>
                     </div>
                 </div>
             </div>
             <div class="items-display">
-                <p>Items to find:</p>
+                <p>Objekt att hitta:</p>
                 <div id="guessingItemsList" class="items-list"></div>
             </div>
             <div class="location-info">
-                <div class="distance-display" id="distanceDisplay">Distance: --</div>
-                <div class="score" id="scoreDisplay">Score: 0</div>
-                <div class="status" id="locationStatus">Move around to find the location!</div>
+                <div class="distance-display" id="distanceDisplay">Avstånd: --</div>
+                <div class="score" id="scoreDisplay">Poäng: 0</div>
+                <div class="status" id="locationStatus">Rör dig runt för att hitta platsen!</div>
             </div>
-            <button class="btn secondary" onclick="goBackToPhoto()">🏃‍♂️ Give Up & Take New Photo</button>
+            <button class="btn secondary" onclick="goBackToPhoto()">🏃‍♂️ Ge upp & Ta nytt foto</button>
         </div>
     </div>
 

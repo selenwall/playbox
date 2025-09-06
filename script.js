@@ -25,9 +25,9 @@ const detectionLoading = document.getElementById('detectionLoading');
 // Initialize the game
 async function initGame() {
     try {
-        showStatus('Loading AI model...', 'loading');
+        showStatus('Laddar AI-modell...', 'loading');
         gameState.model = await cocoSsd.load();
-        showStatus('Model loaded! Ready to take photos.', 'success');
+        showStatus('Modell laddad! Redo att ta foton.', 'success');
         
         // Only initialize camera if we're not in guessing mode
         if (gameState.mode !== 'guessing') {
@@ -35,7 +35,7 @@ async function initGame() {
         }
     } catch (error) {
         console.error('Error initializing game:', error);
-        showStatus('Error loading game. Please refresh the page.', 'error');
+        showStatus('Fel vid laddning av spelet. Vänligen ladda om sidan.', 'error');
     }
 }
 
@@ -54,7 +54,7 @@ async function initCamera() {
         console.log('Camera initialized for photo mode');
     } catch (error) {
         console.error('Error accessing camera:', error);
-        showStatus('Camera access denied. Please allow camera access and refresh.', 'error');
+        showStatus('Kameraåtkomst nekad. Vänligen tillåt kameraåtkomst och ladda om.', 'error');
     }
 }
 
@@ -83,20 +83,20 @@ async function startCamera() {
         console.log('Camera started for photo mode');
     } catch (error) {
         console.error('Error starting camera:', error);
-        showStatus('Failed to start camera. Please try again.', 'error');
+        showStatus('Misslyckades att starta kameran. Vänligen försök igen.', 'error');
     }
 }
 
 // Capture photo and detect objects
 captureBtn.addEventListener('click', async function() {
     if (!gameState.model) {
-        showStatus('Model not loaded yet. Please wait.', 'error');
+        showStatus('Modellen är inte laddad än. Vänligen vänta.', 'error');
         return;
     }
 
     try {
         captureBtn.disabled = true;
-        showStatus('Capturing photo...', 'loading');
+        showStatus('Tar foto...', 'loading');
         
         // Capture photo at much smaller size for URL sharing
         const context = canvas.getContext('2d');
@@ -153,7 +153,7 @@ captureBtn.addEventListener('click', async function() {
         detectionLoading.style.display = 'none';
         
         if (gameState.detectedItems.length === 0) {
-            showStatus('No items detected. Try taking another photo.', 'error');
+            showStatus('Inga objekt upptäckta. Försök ta ett nytt foto.', 'error');
             captureBtn.disabled = false;
             return;
         }
@@ -163,7 +163,7 @@ captureBtn.addEventListener('click', async function() {
         
     } catch (error) {
         console.error('Error capturing photo:', error);
-        showStatus('Error capturing photo. Please try again.', 'error');
+        showStatus('Fel vid fototagning. Vänligen försök igen.', 'error');
         captureBtn.disabled = false;
         detectionLoading.style.display = 'none';
     }
@@ -237,7 +237,7 @@ function startGuessing() {
 // Start location tracking for guessing
 function startLocationTracking() {
     if (!navigator.geolocation) {
-        showStatus('Geolocation not supported by this browser.', 'error');
+        showStatus('Geolokalisering stöds inte av denna webbläsare.', 'error');
         return;
     }
 
@@ -251,7 +251,7 @@ function startLocationTracking() {
         },
         function(error) {
             console.error('Geolocation error:', error);
-            showStatus('Location access denied. Please enable location services.', 'error');
+            showStatus('Platsåtkomst nekad. Vänligen aktivera platsjänster.', 'error');
         },
         {
             enableHighAccuracy: true,
@@ -272,18 +272,18 @@ function updateDistance() {
         gameState.currentLocation.longitude
     );
 
-    distanceDisplay.textContent = `Distance: ${distance.toFixed(1)}m`;
-    scoreDisplay.textContent = `Score: ${gameState.score}`;
+    distanceDisplay.textContent = `Avstånd: ${distance.toFixed(1)}m`;
+    scoreDisplay.textContent = `Poäng: ${gameState.score}`;
 
     if (distance <= 10) {
         if (gameState.score === 0) {
             gameState.score = 1;
-            locationStatus.textContent = '🎉 Congratulations! You found the location!';
+            locationStatus.textContent = '🎉 Grattis! Du hittade platsen!';
             locationStatus.className = 'status success';
             updateGiveUpButton();
         }
     } else {
-        locationStatus.textContent = 'Move around to find the location!';
+        locationStatus.textContent = 'Rör dig runt för att hitta platsen!';
         locationStatus.className = 'status';
         updateGiveUpButton();
     }
@@ -363,12 +363,12 @@ function goBackToPhoto() {
 // Generate shareable link with encoded data
 function generateShareLink() {
     if (!gameState.detectedItems || gameState.detectedItems.length === 0) {
-        showStatus('No items to share! Take a photo first.', 'error');
+        showStatus('Inga objekt att dela! Ta ett foto först.', 'error');
         return null;
     }
     
     if (!gameState.photoLocation) {
-        showStatus('No location data! Take a photo first.', 'error');
+        showStatus('Inga platsdata! Ta ett foto först.', 'error');
         return null;
     }
     
@@ -401,7 +401,7 @@ async function shareItems() {
     const shareUrl = generateShareLink();
     if (!shareUrl) return;
     
-    const shareText = `🎯 Location Guessing Game Challenge!\n\nI found these items in a photo: ${gameState.detectedItems.join(', ')}\n\nCan you guess where I took this photo? Click the link to play!`;
+    const shareText = `🎯 Var?! - Platsgissningsutmaning!\n\nJag hittade dessa objekt i ett foto: ${gameState.detectedItems.join(', ')}\n\nKan du gissa var jag tog detta foto? Klicka på länken för att spela!`;
     
     console.log('Share URL:', shareUrl);
     console.log('Navigator.share available:', !!navigator.share);
@@ -410,15 +410,15 @@ async function shareItems() {
         try {
             console.log('Attempting native share...');
             await navigator.share({
-                title: 'Location Guessing Game Challenge',
+                title: 'Var?! - Platsgissningsutmaning',
                 text: shareText,
                 url: shareUrl
             });
             console.log('Share successful');
-            showStatus('Challenge shared successfully!', 'success');
+            showStatus('Utmaning delad framgångsrikt!', 'success');
         } catch (error) {
             console.log('Share cancelled or failed:', error);
-            showStatus('Share cancelled, showing link instead...', 'loading');
+            showStatus('Delning avbruten, visar länk istället...', 'loading');
             setTimeout(() => showShareLink(), 1000);
         }
     } else {
@@ -449,7 +449,7 @@ async function copyShareLink() {
     try {
         if (navigator.clipboard && navigator.clipboard.writeText) {
             await navigator.clipboard.writeText(shareUrl);
-            showStatus('Share link copied to clipboard!', 'success');
+            showStatus('Delningslänk kopierad till urklipp!', 'success');
         } else {
             throw new Error('Clipboard API not available');
         }
@@ -468,12 +468,12 @@ function copyShareUrl() {
     try {
         const successful = document.execCommand('copy');
         if (successful) {
-            showStatus('Link copied to clipboard!', 'success');
+            showStatus('Länk kopierad till urklipp!', 'success');
         } else {
-            showStatus('Failed to copy. Please select and copy manually.', 'error');
+            showStatus('Misslyckades att kopiera. Vänligen markera och kopiera manuellt.', 'error');
         }
     } catch (err) {
-        showStatus('Failed to copy. Please select and copy manually.', 'error');
+        showStatus('Misslyckades att kopiera. Vänligen markera och kopiera manuellt.', 'error');
     }
 }
 
@@ -549,7 +549,7 @@ function checkForChallengeData() {
             // Set mode to guessing to prevent camera initialization
             gameState.mode = 'guessing';
             
-            showStatus(`Challenge loaded! Find items: ${parsed.items.join(', ')}`, 'success');
+            showStatus(`Utmaning laddad! Hitta objekt: ${parsed.items.join(', ')}`, 'success');
             
             // Auto-start guessing mode
             setTimeout(() => {
@@ -557,7 +557,7 @@ function checkForChallengeData() {
             }, 2000);
         } else {
             console.error('Failed to parse challenge data');
-            showStatus('Invalid challenge data - check console for details', 'error');
+            showStatus('Ogiltiga utmaningsdata - kontrollera konsolen för detaljer', 'error');
         }
     }
 }
